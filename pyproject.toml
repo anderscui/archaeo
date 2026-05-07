@@ -1,0 +1,53 @@
+[project]
+name = "archaeo"
+version = "0.0.1"
+description = "A small Python foundation library for reusable project utilities."
+readme = "README.md"
+requires-python = ">=3.12"
+license = {text = "MIT"}
+
+authors=[
+    {name='Anders Cui'}
+]
+#maintainers=[
+#    {name='Anders Cui'}
+#]
+
+keywords = ["text", "io"]
+
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Environment :: Console",
+#    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Text Processing",
+]
+
+dependencies = [
+]
+
+[project.urls]
+Homepage = "https://github.com/anderscui/archaeo"
+Repository = "https://github.com/anderscui/archaeo"
+#Issues = "https://github.com/anderscui/archaeo/issues"
+#Documentation = "https://github.com/anderscui/archaeo/wiki"
+#Changelog = "https://github.com/anderscui/archaeo/blob/main/CHANGELOG.md"
+
+#[project.scripts]
+#archaeo = "archaeo.cli.main:app"
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+archaeo = ["**/*.txt", "**/*.json", "**/*.yaml"]
