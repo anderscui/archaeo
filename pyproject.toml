@@ -30,6 +30,8 @@ classifiers = [
 ]
 
 dependencies = [
+    "pydantic>=2.13.4",
+    "pymupdf>=1.27.2.3",
 ]
 
 [project.urls]
@@ -51,3 +53,12 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 archaeo = ["**/*.txt", "**/*.json", "**/*.yaml"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.3",
+]
