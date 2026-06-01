@@ -1,13 +1,16 @@
 # coding=utf-8
 import logging
 import re
+from collections import Counter
 from pathlib import Path
 
 import fitz
 from pydantic import BaseModel, PrivateAttr, Field
+from pymupdf.mupdf import pdf_image_rewriter_options
 
 from archaeo.iterable import rename_keys
 from archaeo.maths import Rectangle
+from archaeo.texts import contains_zh_or_alphabet
 
 logger = logging.getLogger(__name__)
 
@@ -281,6 +284,13 @@ class PdfBlock(BaseModel):
     def is_single_line(self):
         return len(self.lines) == 1
 
+    @property
+    def spans(self) -> list[PdfSpan]:
+        return sum([line.spans for line in self.lines], [])
+
+    @property
+    def first_span(self) -> PdfSpan:
+        return self.lines[0].spans[0]
 
 class TextBlock(PdfBlock):
     type: int = 0
@@ -387,7 +397,7 @@ class PdfDocument(BaseModel):
     def load_file(cls,
                   file_path: str,
                   image_dir: str | Path | None = None,
-                  n_pages: int = None):
+                  n_pages: int | None = None):
 
         if n_pages is not None and n_pages < 1:
             raise ValueError(f'Number of pages should be a positive integer.')
@@ -413,6 +423,301 @@ class PdfDocument(BaseModel):
             raise
 
         return cls(pages=pages)
+
+
+def normalize_header_footer_text(text: str) -> str:
+    text = text.strip()
+    text = re.sub(r'\s+', ' ', text)
+    text = re.sub(r'\d+', '%d', text)
+    return text
+
+
+def clean_pdf_header_footer(doc: PdfDocument) -> PdfDocument:
+    if len(doc.pages) < 2:
+        return doc
+
+    page_width, page_height = doc.pages[0].width, doc.pages[0].height
+    # print(f'page: ({page_width}, {page_height})')
+
+    header_footer_threshold = 0.1
+    header_limit = page_height * header_footer_threshold
+    footer_limit = page_height * (1-header_footer_threshold)
+
+    n_pages = len(doc.pages)
+    threshold = max(2, round(n_pages * 0.6))
+    # print(f'threshold: {threshold}')
+
+    candidate_blocks = []
+    direct_remove = set()
+
+    for page in doc.pages:
+        for block in page.blocks:
+            if not block.is_text():
+                continue
+
+            if len(block.text) > 200:
+                continue
+
+            in_header = block.bbox.bottom <= header_limit
+            in_footer = block.bbox.top >= footer_limit
+
+            if not (in_header or in_footer):
+                continue
+
+            zone = 'header' if in_header else 'footer'
+            norm_text = normalize_header_footer_text(block.text)
+            if norm_text == '%d':
+                direct_remove.add((block.page_number, block.block_number))
+                continue
+            candidate_blocks.append((block, zone, norm_text))
+
+    c_texts = Counter((zone, nbt) for _, zone, nbt in candidate_blocks)
+    target_patterns = {k for k, cnt in c_texts.most_common() if cnt >= threshold}
+    # print(c_texts.most_common())
+    print('target_patterns:', target_patterns)
+    # target_blocks = [b for b, t in candidate_blocks if t in target_patterns]
+    # print('target_blocks:', len(target_blocks))
+    # for tb in target_blocks:
+    #     print(tb.page_number, tb.block_number, tb.text)
+    repeated_remove = {(block.page_number, block.block_number)
+                       for block, zone, norm_text in candidate_blocks
+                       if (zone, norm_text) in target_patterns}
+    block_info_to_remove = direct_remove | repeated_remove
+    print('to_remove:', sorted(block_info_to_remove))
+
+    new_pages = []
+    for page in doc.pages:
+        new_blocks = [b for b in page.blocks if (b.page_number, b.block_number) not in block_info_to_remove]
+        if new_blocks:
+            page.blocks = new_blocks
+            new_pages.append(page)
+
+    return PdfDocument(pages=new_pages)
+
+
+_CAPTION_PATTERNS = [
+    r'^(figure|fig\.?)\s+\d+\b',
+    r'^table\s+\d+\b',
+    # r'^algorithm\s+\d+\b',
+    # r'^listing\s+\d+\b',
+    # r'^code\s+listing\s+\d+\b',
+]
+
+
+def is_caption_text(text: str) -> bool:
+    text = text.strip()
+
+    return any(
+        re.match(pattern, text, re.I)
+        for pattern in _CAPTION_PATTERNS
+    )
+
+
+# def is_list_item_text(text: str) -> bool:
+#     return False
+
+
+def detect_pdf_section_titles(doc: PdfDocument) -> PdfDocument:
+    def estimate_body_font(_doc: PdfDocument) -> tuple:
+        threshold = 0.8
+
+        c_font_sizes = Counter()
+        c_font_names = Counter()
+        c_font_colors = Counter()
+        for page in _doc.pages:
+            for block in page.blocks:
+                if not block.is_text():
+                    continue
+                for line in block.lines:
+                    for span in line.spans:
+                        # print(round(span.font_size, 1), span.font_name, span.font_color, span.is_bold())
+                        span_text_count = len(span.text)
+                        c_font_sizes[round(span.font_size, 1)] += span_text_count
+                        c_font_names[span.font_name] += span_text_count
+                        c_font_colors[span.font_color] += span_text_count
+
+        print(c_font_sizes.most_common())
+        print(c_font_names.most_common())
+        print(c_font_colors.most_common())
+
+        most_common_font_size, most_common_fs_count = c_font_sizes.most_common(1)[0]
+        most_common_font_name, fn_count = c_font_names.most_common(1)[0]
+        most_common_font_color, fc_count = c_font_colors.most_common(1)[0]
+        print(most_common_font_size, most_common_fs_count / c_font_sizes.total())
+        print(most_common_font_name, fn_count / c_font_names.total())
+        print(most_common_font_color, fc_count / c_font_colors.total())
+
+        font_size = None
+        if most_common_fs_count / c_font_sizes.total() > threshold:
+            font_size = most_common_font_size
+        else:
+            accum_fs_cnt = 0
+            for fs_item, fs_item_cnt in c_font_sizes.most_common():
+                if abs(most_common_font_size - fs_item) <= 0.2:
+                    accum_fs_cnt += fs_item_cnt
+                else:
+                    break
+            if accum_fs_cnt / c_font_sizes.total() > threshold:
+                font_size = most_common_font_size
+                print(most_common_font_size, accum_fs_cnt / c_font_sizes.total())
+
+        font_name = None
+        if fn_count / c_font_names.total() > threshold:
+            font_name = most_common_font_name
+        font_color = None
+        if fc_count / c_font_colors.total() > threshold:
+            font_color = most_common_font_color
+        print(f'detected font: {font_size}, {font_name}, {font_color}')
+        return font_size, font_name, font_color
+
+    def is_title_candidate(_block: PdfBlock, body_font_size: float | None, *, max_chars: int = 150):
+        if body_font_size is None:
+            return False
+
+        if not _block.is_text():
+            return False
+
+        text = _block.text.strip()
+        if not text or len(text) > max_chars:
+            return False
+
+        if len(_block.lines) > 3:
+            return False
+
+        # if is_caption_text(text):
+        #     return False
+
+        # if is_list_item_text(text):
+        #     return False
+
+        font_size = round(_block.lines[0].spans[0].font_size, 1)
+        is_larger = font_size >= body_font_size + 1.5
+
+        return is_larger
+
+    def is_vertical_block(_block: PdfBlock) -> bool:
+        return _block.bbox.height >= (_block.bbox.width * 2.0)
+
+    def score_section_title(
+            _block,
+            body_font_size: float,
+            prev_block=None,
+            next_block=None,
+    ) -> float:
+        score = 0.0
+
+        if body_font_size is None:
+            return 0.0
+
+        text = _block.text.strip()
+        if not text:
+            return 0.0
+
+        # short text
+        if len(text) <= 80:
+            score += 1.0
+        elif len(text) <= 160:
+            score += 0.5
+        else:
+            score -= 2.0
+
+        # line count
+        if len(_block.lines) == 1:
+            score += 1.0
+        elif len(_block.lines) <= 3:
+            score += 0.5
+        else:
+            score -= 2.0
+
+        # font size
+        cur_font_size = _block.first_span.font_size
+        size_diff = cur_font_size - body_font_size
+        if size_diff >= 4:
+            score += 3.0
+        elif size_diff >= 2:
+            score += 2.0
+        elif size_diff >= 1:
+            score += 1.0
+
+        if cur_font_size < body_font_size:
+            if cur_font_size < body_font_size - 3:
+                score -= 5.0
+            elif cur_font_size < body_font_size - 2:
+                score -= 2.0
+            elif cur_font_size < body_font_size - 1:
+                score -= 1.0
+            elif cur_font_size < body_font_size - 0.5:
+                score -= 0.5
+
+        # bold
+        if _block.first_span.is_bold():
+            score += 1.5
+
+        # vertical spacing
+        if prev_block is not None:
+            gap_before = _block.bbox.top - prev_block.bbox.bottom
+            if gap_before > body_font_size * 2.0:
+                score += 2.0
+            elif gap_before > body_font_size * 1.0:
+                score += 1.0
+
+        if next_block is not None:
+            gap_after = next_block.bbox.top - _block.bbox.bottom
+            if gap_after > body_font_size * 2.0:
+                score += 1.0
+            elif gap_after > body_font_size * 1.0:
+                score += 0.5
+
+        # # bad signs
+        if is_caption_text(text):
+            score -= 3.0
+
+        # if is_list_item_text(text):
+        #     score -= 2.0
+
+        if text.endswith('.'):
+            score -= 0.8
+
+        if not contains_zh_or_alphabet(_block.text):
+            score -= 5.0
+
+        if is_vertical_block(_block):
+            score -= 5.0
+
+        return score
+
+    body_font_size, body_font_name, body_font_color = estimate_body_font(doc)
+    if body_font_size is None:
+        return doc
+
+    for page in doc.pages:
+        blocks = page.blocks
+        for i, block in enumerate(blocks):
+            if not block.is_text():
+                continue
+            prev_block = blocks[i-1] if i > 0 else None
+            next_block = blocks[i+1] if i < len(blocks) - 1 else None
+            score = score_section_title(block,
+                                        body_font_size=body_font_size,
+                                        prev_block=prev_block,
+                                        next_block=next_block)
+            # if block.text.startswith('2.1'):
+            #     print(score, block.text)
+
+            if score >= 3.9:
+                print(f'score: {score}')
+                print(block.page_number, block.text)
+                print()
+
+    return doc
+
+
+def clean_pdf_doc(doc: PdfDocument) -> PdfDocument:
+    doc = clean_pdf_header_footer(doc)
+    print('\n')
+    print(f'detecting pdf sections...')
+    doc = detect_pdf_section_titles(doc)
+    return doc
 
 
 def get_pdf_page_count(file_path: str):
@@ -502,38 +807,44 @@ if __name__ == '__main__':
     # file = '/Users/andersc/data/papers/arxiv/2511.21631 - Qwen3-VL Technical Report.pdf'
     # file = '/Users/andersc/Downloads/papers/Fundamentals of Building Autonomous LLM Agents (2025.10).pdf'
     # file = '/Users/andersc/data/dev/local_kb/Who Will Monetize Truth - A Thesis for the Future of the Information Business (2026.03).pdf'
-    file = '/Users/andersc/data/dev/local_kb/ThoughtWorks - Technology Radar 1269.pdf'
+    # file = '/Users/andersc/data/dev/local_kb/ThoughtWorks - Technology Radar 1269.pdf'
+    file = '/Users/andersc/data/dev/local_kb/Stanford_ai_index_report_2026.pdf'
+    # file = '/Users/andersc/data/dev/local_kb/DeepSeek-V4 - Towards Highly Efficient Million-Token Context Intelligence (2026.04).pdf'
+    # file = '/Users/andersc/Downloads/八分半/看理想十年之选长名单（人生书单内部资料）.pdf'
     # output_dir = '/Users/andersc/data/papers/pdf/LLM Agents'
     output_dir = None
-    n_pages = 10
+    n_pages = 100
 
     print('metadata:', get_pdf_metadata(file))
 
     doc = PdfDocument.load_file(file, image_dir=output_dir, n_pages=n_pages)
     print(f'page count: {len(doc.pages)}\n')
-    for page in doc.pages:
-        if page.page_number > n_pages:
-            break
+    clean_pdf_doc(doc)
 
-        print(f'page {page.page_number}: ({page.width}, {page.height}), {len(page.blocks)} blocks:')
-
-        for block in page.blocks:
-            # print(f'block: {block.type}, {block.page_number}, {block.block_number}')
-            if block.is_text():
-                print(block.text[:200])
-                print('\n')
-
-                # if 'Background of LLMs' in block.text:
-                #     print('block sample:')
-                #     for line in block.lines:
-                #         for span in line.spans:
-                #             print(span)
-                #             print()
-
-            else:
-                if block.image_path:
-                    print('image:', block.image_path)
-                    print(block.bbox)
-                    print()
-
-        print('\n')
+    # for page in doc.pages:
+    #     if page.page_number > n_pages:
+    #         break
+    #
+    #     print(f'page {page.page_number}: ({page.width}, {page.height}), {len(page.blocks)} blocks:')
+    #
+    #     for block in page.blocks:
+    #         # print(f'block: {block.type}, {block.page_number}, {block.block_number}')
+    #         print(block.page_number, block.block_number, block.bbox)
+    #         if block.is_text():
+    #             print(block.text[:20000])
+    #             print()
+    #
+    #             # if 'Background of LLMs' in block.text:
+    #             #     print('block sample:')
+    #             #     for line in block.lines:
+    #             #         for span in line.spans:
+    #             #             print(span)
+    #             #             print()
+    #
+    #         else:
+    #             if block.image_path:
+    #                 print('image:', block.image_path)
+    #                 print(block.bbox)
+    #                 print()
+    #
+    #     print('\n')
