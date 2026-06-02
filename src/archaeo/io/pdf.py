@@ -3,10 +3,10 @@ import logging
 import re
 from collections import Counter
 from pathlib import Path
+from datetime import datetime, timedelta, timezone
 
 import fitz
 from pydantic import BaseModel, PrivateAttr, Field
-from pymupdf.mupdf import pdf_image_rewriter_options
 
 from archaeo.iterable import rename_keys
 from archaeo.maths import Rectangle
@@ -19,6 +19,14 @@ FLAG_ITALIC = 1 << 1
 FLAG_SERIFED = 1 << 2
 FLAG_MONOSPACED = 1 << 3
 FLAG_BOLD = 1 << 4
+
+_CAPTION_PATTERNS = [
+    r'^(figure|fig\.?)\s+\d+\b',
+    r'^table\s+\d+\b',
+    # r'^algorithm\s+\d+\b',
+    # r'^listing\s+\d+\b',
+    # r'^code\s+listing\s+\d+\b',
+]
 
 
 def save_image_block(
@@ -425,6 +433,19 @@ class PdfDocument(BaseModel):
         return cls(pages=pages)
 
 
+class PdfDocSection(BaseModel):
+    title: str | None = None
+    level: int = 1
+    title_block: PdfBlock | None = None
+    blocks: list[PdfBlock] = Field(default_factory=list)
+    children: list['PdfDocSection'] = Field(default_factory=list)
+
+
+class PdfDocSections(BaseModel):
+    source: str | None = None
+    sections: list[PdfDocSection] = Field(default_factory=list)
+
+
 def normalize_header_footer_text(text: str) -> str:
     text = text.strip()
     text = re.sub(r'\s+', ' ', text)
@@ -488,20 +509,11 @@ def clean_pdf_header_footer(doc: PdfDocument) -> PdfDocument:
     new_pages = []
     for page in doc.pages:
         new_blocks = [b for b in page.blocks if (b.page_number, b.block_number) not in block_info_to_remove]
-        if new_blocks:
-            page.blocks = new_blocks
-            new_pages.append(page)
+        # if new_blocks:
+        page.blocks = new_blocks
+        new_pages.append(page)
 
     return PdfDocument(pages=new_pages)
-
-
-_CAPTION_PATTERNS = [
-    r'^(figure|fig\.?)\s+\d+\b',
-    r'^table\s+\d+\b',
-    # r'^algorithm\s+\d+\b',
-    # r'^listing\s+\d+\b',
-    # r'^code\s+listing\s+\d+\b',
-]
 
 
 def is_caption_text(text: str) -> bool:
@@ -517,7 +529,10 @@ def is_caption_text(text: str) -> bool:
 #     return False
 
 
-def detect_pdf_section_titles(doc: PdfDocument) -> PdfDocument:
+def build_document_sections(doc: PdfDocument,
+                            *,
+                            title_threshold: float=3.9) -> PdfDocSections:
+
     def estimate_body_font(_doc: PdfDocument) -> tuple:
         threshold = 0.8
 
@@ -539,6 +554,9 @@ def detect_pdf_section_titles(doc: PdfDocument) -> PdfDocument:
         print(c_font_sizes.most_common())
         print(c_font_names.most_common())
         print(c_font_colors.most_common())
+
+        if not c_font_sizes:
+            return None, None, None
 
         most_common_font_size, most_common_fs_count = c_font_sizes.most_common(1)[0]
         most_common_font_name, fn_count = c_font_names.most_common(1)[0]
@@ -569,31 +587,6 @@ def detect_pdf_section_titles(doc: PdfDocument) -> PdfDocument:
             font_color = most_common_font_color
         print(f'detected font: {font_size}, {font_name}, {font_color}')
         return font_size, font_name, font_color
-
-    def is_title_candidate(_block: PdfBlock, body_font_size: float | None, *, max_chars: int = 150):
-        if body_font_size is None:
-            return False
-
-        if not _block.is_text():
-            return False
-
-        text = _block.text.strip()
-        if not text or len(text) > max_chars:
-            return False
-
-        if len(_block.lines) > 3:
-            return False
-
-        # if is_caption_text(text):
-        #     return False
-
-        # if is_list_item_text(text):
-        #     return False
-
-        font_size = round(_block.lines[0].spans[0].font_size, 1)
-        is_larger = font_size >= body_font_size + 1.5
-
-        return is_larger
 
     def is_vertical_block(_block: PdfBlock) -> bool:
         return _block.bbox.height >= (_block.bbox.width * 2.0)
@@ -687,36 +680,52 @@ def detect_pdf_section_titles(doc: PdfDocument) -> PdfDocument:
         return score
 
     body_font_size, body_font_name, body_font_color = estimate_body_font(doc)
-    if body_font_size is None:
-        return doc
+
+    sections = []
+    current = PdfDocSection(title=None, level=0, blocks=[])
+
+    # if body_font_size is None:
+    #     return doc
 
     for page in doc.pages:
         blocks = page.blocks
+
         for i, block in enumerate(blocks):
             if not block.is_text():
+                current.blocks.append(block)
                 continue
+
             prev_block = blocks[i-1] if i > 0 else None
             next_block = blocks[i+1] if i < len(blocks) - 1 else None
             score = score_section_title(block,
                                         body_font_size=body_font_size,
                                         prev_block=prev_block,
                                         next_block=next_block)
-            # if block.text.startswith('2.1'):
-            #     print(score, block.text)
 
-            if score >= 3.9:
-                print(f'score: {score}')
-                print(block.page_number, block.text)
+            if score >= title_threshold:
+
+                print(f'section title found: score: {score}')
+                print('page:', block.page_number, 'text:', block.text)
                 print()
 
-    return doc
+                if current.title is not None or current.blocks:
+                    sections.append(current)
+
+                current = PdfDocSection(title=block.text.strip(),
+                                        level=1,
+                                        title_block=block,
+                                        blocks=[])
+            else:
+                current.blocks.append(block)
+
+    if current.title is not None or current.blocks:
+        sections.append(current)
+
+    return PdfDocSections(sections=sections)
 
 
 def clean_pdf_doc(doc: PdfDocument) -> PdfDocument:
     doc = clean_pdf_header_footer(doc)
-    print('\n')
-    print(f'detecting pdf sections...')
-    doc = detect_pdf_section_titles(doc)
     return doc
 
 
@@ -736,9 +745,6 @@ def get_pdf_metadata(file_path: str):
     except Exception as e:
         logger.error(f'get pdf metadata error: {e}')
         raise
-
-
-from datetime import datetime, timedelta, timezone
 
 
 def parse_pdf_date(date_str: str | None) -> datetime | None:
@@ -808,18 +814,23 @@ if __name__ == '__main__':
     # file = '/Users/andersc/Downloads/papers/Fundamentals of Building Autonomous LLM Agents (2025.10).pdf'
     # file = '/Users/andersc/data/dev/local_kb/Who Will Monetize Truth - A Thesis for the Future of the Information Business (2026.03).pdf'
     # file = '/Users/andersc/data/dev/local_kb/ThoughtWorks - Technology Radar 1269.pdf'
-    file = '/Users/andersc/data/dev/local_kb/Stanford_ai_index_report_2026.pdf'
+    # file = '/Users/andersc/data/dev/local_kb/Stanford_ai_index_report_2026.pdf'
+    file = '/Users/andersc/data/dev/local_kb/TheEconomist.2026.05.09.pdf'
     # file = '/Users/andersc/data/dev/local_kb/DeepSeek-V4 - Towards Highly Efficient Million-Token Context Intelligence (2026.04).pdf'
     # file = '/Users/andersc/Downloads/八分半/看理想十年之选长名单（人生书单内部资料）.pdf'
     # output_dir = '/Users/andersc/data/papers/pdf/LLM Agents'
     output_dir = None
-    n_pages = 100
+    n_pages = 50
 
     print('metadata:', get_pdf_metadata(file))
 
     doc = PdfDocument.load_file(file, image_dir=output_dir, n_pages=n_pages)
     print(f'page count: {len(doc.pages)}\n')
     clean_pdf_doc(doc)
+    doc_sections = build_document_sections(doc)
+    for sec in doc_sections.sections:
+        print(sec.title, sec.level, len(sec.blocks))
+        print()
 
     # for page in doc.pages:
     #     if page.page_number > n_pages:
