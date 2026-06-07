@@ -729,6 +729,14 @@ def clean_pdf_doc(doc: PdfDocument) -> PdfDocument:
     return doc
 
 
+def load_pdf_sections(file_path: str, output_image_dir: str | None=None, n_pages: int | None=None):
+    doc = PdfDocument.load_file(file_path, image_dir=output_image_dir, n_pages=n_pages)
+    # print(f'page count: {len(doc.pages)}\n')
+    clean_pdf_doc(doc)
+    doc_sections = build_document_sections(doc)
+    return doc_sections
+
+
 def get_pdf_page_count(file_path: str):
     try:
         with fitz.open(file_path) as doc:
@@ -820,14 +828,15 @@ if __name__ == '__main__':
     # file = '/Users/andersc/Downloads/八分半/看理想十年之选长名单（人生书单内部资料）.pdf'
     # output_dir = '/Users/andersc/data/papers/pdf/LLM Agents'
     output_dir = None
-    n_pages = 50
+    n_pages = 30
 
     print('metadata:', get_pdf_metadata(file))
 
-    doc = PdfDocument.load_file(file, image_dir=output_dir, n_pages=n_pages)
-    print(f'page count: {len(doc.pages)}\n')
-    clean_pdf_doc(doc)
-    doc_sections = build_document_sections(doc)
+    # doc = PdfDocument.load_file(file, image_dir=output_dir, n_pages=n_pages)
+    # print(f'page count: {len(doc.pages)}\n')
+    # clean_pdf_doc(doc)
+    # doc_sections = build_document_sections(doc)
+    doc_sections = load_pdf_sections(file, output_image_dir=output_dir, n_pages=n_pages)
     for sec in doc_sections.sections:
         print(sec.title, sec.level, len(sec.blocks))
         print()
