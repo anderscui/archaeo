@@ -24,7 +24,7 @@ class OpenRouterProvider(BaseLlmProvider):
     def capabilities(self):
         return {'chat'}
 
-    def chat(self, messages, stream=False, extra_headers: dict=None):
+    def chat(self, messages, stream=False, think: bool | None = None, extra_headers: dict | None=None):
         headers = {
             'Authorization': f'Bearer {self.api_key}',
             'Content-Type': 'application/json',
@@ -38,6 +38,9 @@ class OpenRouterProvider(BaseLlmProvider):
             'messages': messages,
             'stream': stream
         }
+        if think is not None:
+            payload['reasoning'] = {'enabled': think}
+
         resp = requests.post(
             f'{self.base_url}/chat/completions',
             headers=headers,
@@ -267,6 +270,8 @@ class OpenRouterModels:
     openai_emb_3_small = 'openai/text-embedding-3-small'  # $0.02
     openai_emb_2_ada = 'openai/text-embedding-ada-002' # $0.10
 
+    claude_opus_4_8_fast = 'anthropic/claude-opus-4.8-fast'  # $10-50, 2026.05
+    claude_opus_4_8 = 'anthropic/claude-opus-4.8'  # $5-25, 2026.05
     claude_opus_4_7_fast = 'anthropic/claude-opus-4.7-fast'  # $30-150, 2026.05
     claude_opus_4_7 = 'anthropic/claude-opus-4.7'  # coding, $5-25, 2026.04
     claude_opus_4_6 = 'anthropic/claude-opus-4.6'  # coding, $5-25, 2026.02
@@ -288,7 +293,7 @@ class OpenRouterModels:
     gemini_flash_3 = 'google/gemini-3-flash-preview'  # $0.5-3, 2025.12
     # gemini_flash_2_5 = 'google/gemini-2.5-flash'  # translation, $0.3-2.5, 2025.06
     # gemini_flash_lite_2_5 = 'google/gemini-2.5-flash-lite'  # translation, $0.1-0.4, 2025.07
-    gemini_pro_2_5 = 'google/gemini-2.5-pro'  # translation, $1.25-10, 2025.06
+    # gemini_pro_2_5 = 'google/gemini-2.5-pro'  # translation, $1.25-10, 2025.06
 
     gemini_chirp_3 = 'google/chirp-3'  # speech-to-text, $0.016/minute, 2026.05
     gemini_flash_tts_3_1 = 'google/gemini-3.1-flash-tts-preview'  # text-to-speech, $1-20, 2026.04
@@ -302,12 +307,13 @@ class OpenRouterModels:
     google_lyria_3_clip = 'google/lyria-3-clip-preview'  # music gen, $0.04 per song, 2026.03
 
     gemini_emb_1 = 'google/gemini-embedding-001'  # $0.15, 2025.10
-    gemini_emb_2 = 'google/gemini-embedding-2-preview'  # $0.2, 2026.04
+    gemini_emb_2 = 'google/gemini-embedding-2'  # $0.2, 2026.05
 
     # gemma_4_31b = 'google/gemma-4-31b-it'
     # gemma_4_26b = 'google/gemma-4-26b-a4b-it'
 
     # qwen
+    qwen3_7_plus = 'qwen/qwen3.7-plus'  # $0.4-1.6, 2026.06
     qwen3_7_max = 'qwen/qwen3.7-max'  # $2.5-7.5, 2026.05
     qwen3_6_max = 'qwen/qwen3.6-max-preview'  # $1.3-7.8, 2026.04
     qwen3_6_plus = 'qwen/qwen3.6-plus'  # $0.325-1.95, 2026.04
@@ -330,7 +336,7 @@ class OpenRouterModels:
 
     qwen3_asr_flash_2602 = 'qwen/qwen3-asr-flash-2026-02-10'  # audio -> transcription, $$0.000035/second, 2026.05
 
-    deepseek_v4_flash = 'deepseek/deepseek-v4-flash'  # , $0.14-0.28, 2026.04
+    deepseek_v4_flash = 'deepseek/deepseek-v4-flash'  # , $0.0983-0.1966, 2026.04
     deepseek_v4_pro = 'deepseek/deepseek-v4-pro'  # , $0.435-0.87, 2026.04
     deepseek_r1 = 'deepseek/deepseek-r1'  # 671b-37b, $0.7-2.5, 2025.01
 
@@ -345,6 +351,7 @@ class OpenRouterModels:
     # glm_4_7 = 'z-ai/glm-4.7'  # coding, $0.4-1.5, 2025.12
     # glm_4_6v = 'z-ai/glm-4.6v'  # vision, $0.3-0.9, 2025.12
 
+    minimax_m3 = 'minimax/minimax-m3'  # $0.3-1.2, 2026.06
     minimax_m2_7 = 'minimax/minimax-m2.7'  # $0.3-1.2, coding, 2026.03
     minimax_m2_5 = 'minimax/minimax-m2.5'  # $0.3-1.2, coding, 2026.02
     minimax_m2_her = 'minimax/minimax-m2-her'  # dialog, $0.3-1.2, 2026.01
@@ -360,6 +367,10 @@ class OpenRouterModels:
     grok_voice_tts_1 = 'x-ai/grok-voice-tts-1.0'  # text -> audio, $15/M, 2026.05
     grok_img_img = 'x-ai/grok-imagine-image-quality'  # text/image -> image, $0.05/image, 2026.05
     grok_img_video = 'x-ai/grok-imagine-video'  # text/image -> video, $0.05/second, 2026.05
+
+    mai_voice_2 = 'microsoft/mai-voice-2'  # tts, $22/M, 2026.06
+    mai_transcribe_1_5 = 'microsoft/mai-transcribe-1.5'  # stt, $0.36/hour, 2026.06
+    mai_image_2_5 = 'microsoft/mai-image-2.5'  # text/image -> image, $5/M tokens, 2026.06
 
     mistral_mini_transcribe = 'mistralai/voxtral-mini-transcribe'  # audio -> transcription, $$0.003/second, 2026.05
 

@@ -57,7 +57,7 @@ class BaseLlmProvider(BaseProvider):
         self.name = name
 
     @abstractmethod
-    def chat(self, messages: list[dict[str, str]], stream: bool = False, **kwargs) -> Any:
+    def chat(self, messages: list[dict[str, str]], stream: bool = False, think: bool | None = False, **kwargs) -> Any:
         raise NotImplementedError
 
     @abstractmethod

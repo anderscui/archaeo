@@ -38,8 +38,10 @@ class OllamaProvider(BaseLlmProvider):
             if data_chunk:
                 yield data_chunk
 
-    def chat(self, messages, stream=False, **kwargs):
+    def chat(self, messages, stream=False, think: bool | None = None, **kwargs):
         payload = {"model": self.model, "messages": messages, "stream": stream}
+        if think is not None:
+            payload['think'] = think
         resp = self._request("api/chat", payload, stream=stream)
         if stream:
             return self._stream_chat(resp)
@@ -107,8 +109,8 @@ class OllamaProvider(BaseLlmProvider):
 
 
 if __name__ == '__main__':
-    llm = OllamaProvider()
-    resp = llm.chat(messages=[{'role': 'user', 'content': 'hello，世界。'}], stream=False)
+    llm = OllamaProvider('qwen3.5:9b')
+    resp = llm.chat(messages=[{'role': 'user', 'content': 'hello，世界。'}], stream=False, think=False)
     print(resp)
 
     # print(llm.generate('1+1=?'))
