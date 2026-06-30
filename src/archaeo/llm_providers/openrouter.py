@@ -270,6 +270,7 @@ class OpenRouterModels:
     openai_emb_3_small = 'openai/text-embedding-3-small'  # $0.02
     openai_emb_2_ada = 'openai/text-embedding-ada-002' # $0.10
 
+    claude_fable_5 = 'anthropic/claude-fable-5'  # $10-50, 2026.06
     claude_opus_4_8_fast = 'anthropic/claude-opus-4.8-fast'  # $10-50, 2026.05
     claude_opus_4_8 = 'anthropic/claude-opus-4.8'  # $5-25, 2026.05
     claude_opus_4_7_fast = 'anthropic/claude-opus-4.7-fast'  # $30-150, 2026.05
@@ -340,6 +341,7 @@ class OpenRouterModels:
     deepseek_v4_pro = 'deepseek/deepseek-v4-pro'  # , $0.435-0.87, 2026.04
     deepseek_r1 = 'deepseek/deepseek-r1'  # 671b-37b, $0.7-2.5, 2025.01
 
+    kimi_k2_7_code = 'moonshotai/kimi-k2.7-code'  # coding, $0.75-3.5 2026.06
     kimi_k2_6 = 'moonshotai/kimi-k2.6'  # coding, $0.75-3.5 2026.04
     kimi_k2_5 = 'moonshotai/kimi-k2.5'  # coding, $0.44-2 2026.01
 

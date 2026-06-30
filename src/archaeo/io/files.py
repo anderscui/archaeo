@@ -45,6 +45,10 @@ def iter_files(dirs, pattern='*.*', excludes=None):
             yield fp
 
 
+def get_absolute_path(raw_path: str) -> str:
+    return str(Path(raw_path).expanduser().resolve())
+
+
 def get_file_created_time(path: str | Path) -> datetime | None:
     stat = Path(path).stat()
 
