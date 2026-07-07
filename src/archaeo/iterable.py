@@ -6,9 +6,12 @@ from difflib import SequenceMatcher
 from itertools import islice
 from typing import Any, TypeVar
 
-from toolz import first
-
 T = TypeVar("T")
+
+
+def first(iterable):
+    """ The first element in a iterable"""
+    return next(iter(iterable))
 
 
 def find_by(iterable: Iterable[T],
