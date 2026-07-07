@@ -30,12 +30,14 @@ classifiers = [
 ]
 
 dependencies = [
+    "loguru>=0.7.3",
     "lz4>=4.4.5",
     "openai>=2.41.1",
     "pydantic>=2.13.4",
     "pymupdf>=1.27.2.3",
     "python-dotenv>=1.2.2",
     "requests>=2.34.2",
+    "toolz>=1.1.0",
     "tqdm>=4.68.2",
 ]
 

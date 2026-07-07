@@ -100,5 +100,5 @@ if __name__ == '__main__':
     # print(mdfind('中国古典', search_on_names=True))
     # print(mdfind('中国古典', search_on_names=True, only_in='/Volumes/T2/books/kindle'))
     print()
-    for file in search_files('極致愛撫', extension=''):
+    for file in search_files('现代史', extension=''):
         print(file)
