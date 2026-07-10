@@ -212,6 +212,12 @@ class OpenRouterProvider(BaseLlmProvider):
 class OpenRouterModels:
     gpt_audio = 'openai/gpt-audio'  # $2.5-10, 2026.01
     gpt_audio_mini = 'openai/gpt-audio-mini'  # $0.6-2.4, 2026.01
+    gpt_5_6_luna_pro = 'openai/gpt-5.6-luna-pro'  # $1-6, 2026.07
+    gpt_5_6_luna = 'openai/gpt-5.6-luna'  # $1-6, 2026.07
+    gpt_5_6_terra_pro = 'openai/gpt-5.6-terra-pro'  # $2.5-15, 2026.07
+    gpt_5_6_terra = 'openai/gpt-5.6-terra'  # $2.5-15, 2026.07
+    gpt_5_6_sol_pro = 'openai/gpt-5.6-sol-pro'  # $5-30, 2026.07
+    gpt_5_6_sol = 'openai/gpt-5.6-sol'  # $5-30, 2026.07
     gpt_5_5_pro = 'openai/gpt-5.5-pro'  # $30-180, 2026.04
     gpt_5_5 = 'openai/gpt-5.5'  # $5-30, 2026.04
     gpt_5_4_pro = 'openai/gpt-5.4-pro'  # $30-180, $10/K web search, 2026.03
@@ -248,6 +254,9 @@ class OpenRouterModels:
     gpt_4o_audio = 'openai/gpt-4o-audio-preview'  # $2.5-10, 2025.08
     gpt_4o_mini_tts = 'openai/gpt-4o-mini-tts-2025-12-15'  # $0.6/M, 2026.04
 
+    gpt_image_2 = 'openai/gpt-image-2'  # $8-8, 2026.06
+    gpt_image_1_mini = 'openai/gpt-image-1-mini'  # $2.5-2.5, 2026.06
+    gpt_image_1 = 'openai/gpt-image-1'  # $10-10, 2026.06
     gpt_5_4_image_2 = 'openai/gpt-5.4-image-2'  # $8-15, 2026.04
     gpt_5_image = 'openai/gpt-5-image'  # $10-10, $10/K web search, 2025.10
     gpt_5_image_mini = 'openai/gpt-5-image-mini'  # $2.50-2, $10/K web search, 2025.10
@@ -279,6 +288,7 @@ class OpenRouterModels:
     # claude_opus_4_5 = 'anthropic/claude-opus-4.5'  # coding, $5-25, 2025.11
     # claude_opus_4_1 = 'anthropic/claude-opus-4.1'  # coding, $15-75, 2025.08
     claude_opus_4 = 'anthropic/claude-opus-4'  # coding, $15-75, 2025.05
+    claude_sonnet_5 = 'anthropic/claude-sonnet-5'  # $2-10, 2026.07
     claude_sonnet_4_6 = 'anthropic/claude-sonnet-4.6'  # coding, $3-15, 2026.02
     claude_sonnet_4_5 = 'anthropic/claude-sonnet-4.5'  # coding, $3-15, 2025.09
     claude_sonnet_4 = 'anthropic/claude-sonnet-4'  # image, coding, $3-15, 2025.05
@@ -298,7 +308,10 @@ class OpenRouterModels:
 
     gemini_chirp_3 = 'google/chirp-3'  # speech-to-text, $0.016/minute, 2026.05
     gemini_flash_tts_3_1 = 'google/gemini-3.1-flash-tts-preview'  # text-to-speech, $1-20, 2026.04
-    gemini_flash_2_5_image = 'google/gemini-2.5-flash-image'  # $0.3-2.5, Nano Banan, 2025.10
+    gemini_pro_3_image = 'google/gemini-3-pro-image'  # $2-12, Nano Banana, 2026.06
+    gemini_flash_3_1_image_lite = 'google/gemini-3.1-flash-lite-image'  # $0.25-1.5, Nano Banana, 2026.06
+    gemini_flash_3_1_image = 'google/gemini-3.1-flash-image'  # $0.5-3, Nano Banana, 2026.06
+    gemini_flash_2_5_image = 'google/gemini-2.5-flash-image'  # $0.3-2.5, Nano Banana, 2025.10
 
     google_veo_3_1_fast = 'google/veo-3.1-fast'  # video gen, $0.1 per sec, 2026.04
     google_veo_3_1_lite = 'google/veo-3.1-lite'  # video gen, $0.05 per sec, 2026.04
@@ -345,6 +358,7 @@ class OpenRouterModels:
     kimi_k2_6 = 'moonshotai/kimi-k2.6'  # coding, $0.75-3.5 2026.04
     kimi_k2_5 = 'moonshotai/kimi-k2.5'  # coding, $0.44-2 2026.01
 
+    glm_5_2 = 'z-ai/glm-5.2'  # coding, $0.42-1.32, 2026.06
     glm_5_1 = 'z-ai/glm-5.1'  # coding, $1.05-3.5, 2026.04
     glm_5v_turbo = 'z-ai/glm-5v-turbo'  # mm agent, $1.2-4, 2026.04
     glm_5_turbo = 'z-ai/glm-5-turbo'  # $1.2-4, 2026.03
@@ -360,6 +374,7 @@ class OpenRouterModels:
     minimax_m2 = 'minimax/minimax-m2'  # $0.255-1.0, coding, 2025.10
 
     grok_build_01 = 'x-ai/grok-build-0.1'  # coding, text/image -> text, $1-2, 2026.05
+    grok_4_5 = 'x-ai/grok-4.5'  # $2-6, 2026.07.08
     grok_4_3 = 'x-ai/grok-4.3'  # $1.25-2.5, 2026.05
     grok_4_20_multi_agent = 'x-ai/grok-4.20-multi-agent'  # $2-6, 2026.03
     grok_4_20 = 'x-ai/grok-4.20'  # $2-6, 2026.03
