@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field
 from tqdm import tqdm
 
 from archaeo.chunking.base import Chunk, chunk_pdf
-from archaeo.io.files import json_dump, json_load
+from archaeo.io.files import json_dump, json_load, get_absolute_path
 from archaeo.llm_providers.base import BaseLlmProvider
 
 
@@ -151,12 +151,15 @@ def translate_pdf_by_chunks(
     cache_file: str | Path | None = None,
     **kwargs,
 ) -> TranslationResult:
+    file_path = get_absolute_path(file_path)
     chunks = chunk_pdf(
         str(file_path),
         max_tokens=max_tokens,
         n_pages=n_pages,
     )
 
+    if cache_file:
+        cache_file = get_absolute_path(cache_file)
     return translate_chunks(
         chunks,
         provider,
@@ -182,7 +185,7 @@ def save_translation_markdown(
     result: TranslationResult,
     output_file: str | Path
 ) -> None:
-    output_file = Path(output_file)
+    output_file = get_absolute_path(output_file)
     output_file.parent.mkdir(parents=True, exist_ok=True)
 
     md = translation_result_to_markdown(
@@ -341,13 +344,13 @@ if __name__ == '__main__':
     # print(f'time elapsed: {time.time() - start}')
 
     start = time.time()
-    # pdf_file = '/Users/andersc/Downloads/A Comprehensive Survey on Vector Database - Storage and Retrieval Technique, Challenge (2026.03).pdf'
-    # pdf_file = '/Users/andersc/Downloads/AI research interviews (2025.08).pdf'
-    pdf_file = '/Users/andersc/data/dev/local_kb/new_yorker.2026.06.08.pdf'
+    # pdf_file = '~/Downloads/A Comprehensive Survey on Vector Database - Storage and Retrieval Technique, Challenge (2026.03).pdf'
+    # pdf_file = '~/Downloads/AI research interviews (2025.08).pdf'
+    pdf_file = '~/data/dev/local_kb/new_yorker.2026.06.08.pdf'
     result = translate_pdf_by_chunks(pdf_file, llm,
                                      max_tokens=2000,
                                      n_pages=100,
-                                     cache_file='/Users/andersc/Downloads/new_yorker.2026.06.08.json')
-    save_translation_markdown(result, output_file='/Users/andersc/Downloads/new_yorker.2026.06.08.md')
-    # save_bilingual_markdown(result, output_file='/Users/andersc/Downloads/ai interview1-3.md')
+                                     cache_file='~/Downloads/new_yorker.2026.06.08.json')
+    save_translation_markdown(result, output_file='~/Downloads/new_yorker.2026.06.08.md')
+    # save_bilingual_markdown(result, output_file='~/Downloads/ai interview1-3.md')
     print(f'time elapsed: {time.time() - start}')

@@ -8,6 +8,7 @@ from typing import Any
 import lz4.block
 from pydantic import BaseModel, Field
 
+from archaeo.io.files import get_absolute_path
 
 MOZLZ4_MAGIC = b'mozLz40\0'
 
@@ -78,7 +79,7 @@ def read_mozlz4_json(file_path: str | Path) -> dict[str, Any]:
 
 
 def read_firefox_session(file_path: str | Path) -> FirefoxSession:
-    file_path = Path(file_path)
+    file_path = get_absolute_path(file_path)
     obj = read_mozlz4_json(file_path)
 
     windows = obj.get('windows', [])
@@ -271,7 +272,7 @@ def save_firefox_session_csv(
     session: FirefoxSession,
     output_file: str | Path,
 ) -> None:
-    output_file = Path(output_file)
+    output_file = get_absolute_path(output_file)
     output_file.parent.mkdir(parents=True, exist_ok=True)
 
     with output_file.open(
@@ -350,8 +351,8 @@ def save_firefox_session_txt(
 
 
 if __name__ == '__main__':
-    source_file = '/Users/andersc/Downloads/backups/ff-sessionstore-backups/upgrade.jsonlz4-20260525130955'
+    source_file = '~/Downloads/backups/ff-sessionstore-backups/upgrade.jsonlz4-20260525130955'
     session = read_firefox_session(source_file)
-    # save_firefox_session_markdown(session, output_file='/Users/andersc/Downloads/ff-session-20260525130955.md')
-    # save_firefox_session_txt(session, output_file='/Users/andersc/Downloads/ff-session-20260525130955.txt')
-    save_firefox_session_csv(session, output_file='/Users/andersc/Downloads/ff-session-20260525130955.csv')
+    # save_firefox_session_markdown(session, output_file='~/Downloads/ff-session-20260525130955.md')
+    # save_firefox_session_txt(session, output_file='~/Downloads/ff-session-20260525130955.txt')
+    save_firefox_session_csv(session, output_file='~/Downloads/ff-session-20260525130955.csv')

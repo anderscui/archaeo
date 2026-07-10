@@ -77,8 +77,8 @@ def parent_of_path(path: str | Path) -> Path:
     return Path(path).parent
 
 
-def get_absolute_path(raw_path: str | Path) -> str:
-    return str(Path(raw_path).expanduser().resolve())
+def get_absolute_path(raw_path: str | Path) -> Path:
+    return Path(raw_path).expanduser().resolve()
 
 
 def get_file_created_time(path: str | Path, use_timestamp: bool=True) -> int | datetime | None:
@@ -257,7 +257,7 @@ def json_load(file: str | Path):
 
 
 def json_dump(obj, file: str | Path, ensure_ascii=False, indent=2, create_parent: bool=True):
-    file = Path(file)
+    file = get_absolute_path(file)
     if create_parent:
         file.parent.mkdir(parents=True, exist_ok=True)
     with file.open('w', encoding='utf-8') as fout:

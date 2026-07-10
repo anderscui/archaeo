@@ -1,5 +1,4 @@
 # coding=utf-8
-import logging
 import re
 from collections import Counter
 from pathlib import Path
@@ -8,11 +7,11 @@ from datetime import datetime, timedelta, timezone
 import fitz
 from pydantic import BaseModel, PrivateAttr, Field
 
+from archaeo import logger
+from archaeo.io.docs import Toc, BoundingBox, LocalFileMetadata
+from archaeo.io.files import get_absolute_path
 from archaeo.iterable import rename_keys
-from archaeo.maths import Rectangle
 from archaeo.texts import contains_zh_or_alphabet
-
-logger = logging.getLogger(__name__)
 
 FLAG_SUPERSCRIPT = 1 << 0
 FLAG_ITALIC = 1 << 1
@@ -54,77 +53,6 @@ def save_image_block(
         f.write(image_data)
 
     return image_path
-
-
-class BoundingBox(BaseModel):
-    left: float | int
-    top: float | int
-    right: float | int
-    bottom: float | int
-
-    @classmethod
-    def from_tuple(cls, values: tuple[float, float, float, float]):
-        """
-        elements order: (left, top, right, bottom)
-        :param values:
-        :return:
-        """
-        left, top, right, bottom = values
-        return cls(left=left,
-                   top=top,
-                   right=right,
-                   bottom=bottom)
-
-    def to_tuple(self) -> tuple[float, float, float, float]:
-        return self.left, self.top, self.right, self.bottom
-
-    def resize(self, horizontal_ratio, vertical_ratio):
-        self.left = self.left * horizontal_ratio
-        self.top = self.top * vertical_ratio
-        self.right = self.right * horizontal_ratio
-        self.bottom = self.bottom * vertical_ratio
-
-    def expand(self, by=1.0):
-        return BoundingBox.from_tuple((self.left-by, self.top-by, self.right+by, self.bottom+by))
-
-    @property
-    def width(self) -> float:
-        return self.right - self.left
-
-    @property
-    def height(self) -> float:
-        return self.bottom - self.top
-
-    def round(self, n=3):
-        self.left = round(self.left, n)
-        self.right = round(self.right, n)
-        self.top = round(self.top, n)
-        self.bottom = round(self.bottom, n)
-        return self
-
-    @staticmethod
-    def merge(bboxes: list["BoundingBox"]):
-        left = min(box.left for box in bboxes)
-        top = min(box.top for box in bboxes)
-        right = max(box.right for box in bboxes)
-        bottom = max(box.bottom for box in bboxes)
-        return BoundingBox.from_tuple((left, top, right, bottom))
-
-    @staticmethod
-    def are_intersected(b1, b2, threshold=10.0):
-        intersection = BoundingBox.intersection_of(b1, b2)
-        if not intersection:
-            return False
-        if intersection.width < threshold or intersection.height < threshold:
-            return False
-        return True
-
-    @staticmethod
-    def intersection_of(b1, b2):
-        r1 = Rectangle.from_tuple(b1.to_tuple())
-        r2 = Rectangle.from_tuple(b2.to_tuple())
-        intersection = r1.intersection(r2)
-        return intersection
 
 
 class PdfFont(BaseModel):
@@ -525,10 +453,6 @@ def is_caption_text(text: str) -> bool:
     )
 
 
-# def is_list_item_text(text: str) -> bool:
-#     return False
-
-
 def build_document_sections(doc: PdfDocument,
                             *,
                             title_threshold: float=3.9) -> PdfDocSections:
@@ -746,10 +670,32 @@ def get_pdf_page_count(file_path: str):
         raise
 
 
-def get_pdf_metadata(file_path: str):
+def get_pdf_metadata(file_path: str | Path,
+                     max_outline_level: int = 2) -> LocalFileMetadata:
+    def parse_date_props(meta):
+        for key in ('creationDate', 'modDate'):
+            val = parse_pdf_date(meta.get(key, ''))
+            if val:
+                meta[f'{key}Value'] = val
+        return meta
+
+    file_path = get_absolute_path(file_path)
     try:
         with fitz.open(file_path) as doc:
-            return doc.metadata
+            metadata = dict(doc.metadata or {})
+            metadata['page_count'] = doc.page_count
+            parse_date_props(metadata)
+
+            outlines = []
+            toc = doc.get_toc(simple=False)
+            for item in toc:
+                # page is 1-based
+                lvl, title, page = item[:3]
+                if title.strip() and lvl <= max_outline_level:
+                    outlines.append(item)
+
+        return LocalFileMetadata(metadata=metadata, outline=Toc.load(outlines))
+
     except Exception as e:
         logger.error(f'get pdf metadata error: {e}')
         raise
@@ -817,29 +763,32 @@ def parse_pdf_date(date_str: str | None) -> datetime | None:
 
 
 if __name__ == '__main__':
-    # file = '/Users/andersc/Downloads/cool nlp papers/Cognitive Architectures for Language Agents v3 (2024).pdf'
-    # file = '/Users/andersc/data/papers/arxiv/2511.21631 - Qwen3-VL Technical Report.pdf'
-    # file = '/Users/andersc/Downloads/papers/Fundamentals of Building Autonomous LLM Agents (2025.10).pdf'
-    # file = '/Users/andersc/data/dev/local_kb/Who Will Monetize Truth - A Thesis for the Future of the Information Business (2026.03).pdf'
-    # file = '/Users/andersc/data/dev/local_kb/ThoughtWorks - Technology Radar 1269.pdf'
-    # file = '/Users/andersc/data/dev/local_kb/Stanford_ai_index_report_2026.pdf'
-    file = '/Users/andersc/data/dev/local_kb/TheEconomist.2026.05.09.pdf'
-    # file = '/Users/andersc/data/dev/local_kb/DeepSeek-V4 - Towards Highly Efficient Million-Token Context Intelligence (2026.04).pdf'
-    # file = '/Users/andersc/Downloads/八分半/看理想十年之选长名单（人生书单内部资料）.pdf'
-    # output_dir = '/Users/andersc/data/papers/pdf/LLM Agents'
+    # file = '~/Downloads/cool nlp papers/Cognitive Architectures for Language Agents v3 (2024).pdf'
+    # file = '~/data/papers/arxiv/2511.21631 - Qwen3-VL Technical Report.pdf'
+    # file = '~/Downloads/papers/Fundamentals of Building Autonomous LLM Agents (2025.10).pdf'
+    # file = '~/data/dev/local_kb/Who Will Monetize Truth - A Thesis for the Future of the Information Business (2026.03).pdf'
+    # file = '~/data/dev/local_kb/ThoughtWorks - Technology Radar 1269.pdf'
+    # file = '~/data/dev/local_kb/Stanford_ai_index_report_2026.pdf'
+    file = '~/data/dev/local_kb/TheEconomist.2026.05.09.pdf'
+    # file = '~/data/dev/local_kb/DeepSeek-V4 - Towards Highly Efficient Million-Token Context Intelligence (2026.04).pdf'
+    # file = '~/Downloads/八分半/看理想十年之选长名单（人生书单内部资料）.pdf'
+    # output_dir = '~/data/papers/pdf/LLM Agents'
     output_dir = None
-    n_pages = 30
+    n_pages = 10
 
-    print('metadata:', get_pdf_metadata(file))
+    pdf_meta = get_pdf_metadata(file)
+    print('metadata:', pdf_meta)
+    print('search text:', pdf_meta.to_search_text())
+
 
     # doc = PdfDocument.load_file(file, image_dir=output_dir, n_pages=n_pages)
     # print(f'page count: {len(doc.pages)}\n')
     # clean_pdf_doc(doc)
     # doc_sections = build_document_sections(doc)
-    doc_sections = load_pdf_sections(file, output_image_dir=output_dir, n_pages=n_pages)
-    for sec in doc_sections.sections:
-        print(sec.title, sec.level, len(sec.blocks))
-        print()
+    # doc_sections = load_pdf_sections(file, output_image_dir=output_dir, n_pages=n_pages)
+    # for sec in doc_sections.sections:
+    #     print(sec.title, sec.level, len(sec.blocks))
+    #     print()
 
     # for page in doc.pages:
     #     if page.page_number > n_pages:

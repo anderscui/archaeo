@@ -4,6 +4,7 @@ from pathlib import Path
 
 from pydantic import BaseModel, Field
 
+from archaeo.io.files import get_absolute_path
 from archaeo.io.pdf import PdfDocSections, PdfDocSection, load_pdf_sections
 
 CHARS_PER_TOKEN = 2.5
@@ -173,14 +174,15 @@ def chunk_pdf(file_path: str,
               *,
               max_tokens: int=1000,
               n_pages: int | None=None) -> list[Chunk]:
+    file_path = str(get_absolute_path(file_path))
     sections = load_pdf_sections(file_path, output_image_dir=None, n_pages=n_pages)
     chunks = chunk_pdf_sections(sections, max_tokens=max_tokens)
     return chunks
 
 
 if __name__ == '__main__':
-    # file = '/Users/andersc/data/dev/local_kb/TheEconomist.2026.06.06.pdf'
-    file = '/Users/andersc/data/dev/local_kb/new_yorker.2026.06.08.pdf'
+    # file = '~/data/dev/local_kb/TheEconomist.2026.06.06.pdf'
+    file = '~/data/dev/local_kb/new_yorker.2026.06.08.pdf'
     file_chunks = chunk_pdf(file, max_tokens=3000, n_pages=50)
     for fc in file_chunks:
         print(fc)

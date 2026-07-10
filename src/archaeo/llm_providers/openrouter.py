@@ -390,7 +390,7 @@ if __name__ == '__main__':
 
     all_models = llm.list_models()
     model_data = [model.model_dump(mode='json') for model in all_models]
-    json_dump(model_data, '/Users/andersc/Downloads/openrouter_model_info.json', indent=2)
+    json_dump(model_data, '~/Downloads/openrouter_model_info.json', indent=2)
 
     for m in llm.list_models()[:1000]:
         print(m)
