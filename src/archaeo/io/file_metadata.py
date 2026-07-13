@@ -62,9 +62,6 @@ def get_local_file_metadata(file_path: str | Path) -> LocalFileMetadata:
 
 
 if __name__ == '__main__':
-    # file = '~/Downloads/碎页集/05F4B34A-A63A-4BEA-AFBE-B4DA6809C8E4_1_102_o.jpeg'
-    # print(get_local_file_metadata(file))
-    #
     # file = '~/Downloads/movie/恶魔奶爸推介的英语听力口语大杀器《EnglishPod》/EnglishPod 1-50/0001/englishpod_B0001pr.mp3'
     # print(get_local_file_metadata(file))
     #

@@ -251,7 +251,7 @@ def move_file(
 
 
 def json_load(file: str | Path):
-    file = Path(file)
+    file = get_absolute_path(file)
     with file.open('r', encoding='utf-8') as fin:
         return json.load(fin)
 

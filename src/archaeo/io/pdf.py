@@ -674,7 +674,12 @@ def get_pdf_metadata(file_path: str | Path,
                      max_outline_level: int = 2) -> LocalFileMetadata:
     def parse_date_props(meta):
         for key in ('creationDate', 'modDate'):
-            val = parse_pdf_date(meta.get(key, ''))
+            date_str = meta.get(key, '')
+            try:
+                val = parse_pdf_date(date_str)
+            except Exception as e:
+                logger.warning(f'parse pdf date error: {e}, input: {date_str}')
+                val = None
             if val:
                 meta[f'{key}Value'] = val
         return meta
@@ -769,9 +774,11 @@ if __name__ == '__main__':
     # file = '~/data/dev/local_kb/Who Will Monetize Truth - A Thesis for the Future of the Information Business (2026.03).pdf'
     # file = '~/data/dev/local_kb/ThoughtWorks - Technology Radar 1269.pdf'
     # file = '~/data/dev/local_kb/Stanford_ai_index_report_2026.pdf'
-    file = '~/data/dev/local_kb/TheEconomist.2026.05.09.pdf'
+    # file = '~/data/dev/local_kb/TheEconomist.2026.05.09.pdf'
+    # file = "~/Downloads/books/UTM/Applied Linear Algebra (Instructor's Solution Manual) (Peter J. Olver, Chehrzad Shakiban) (2018).pdf"
+
     # file = '~/data/dev/local_kb/DeepSeek-V4 - Towards Highly Efficient Million-Token Context Intelligence (2026.04).pdf'
-    # file = '~/Downloads/八分半/看理想十年之选长名单（人生书单内部资料）.pdf'
+    file = '~/Downloads/八分半/看理想十年之选长名单（人生书单内部资料）.pdf'
     # output_dir = '~/data/papers/pdf/LLM Agents'
     output_dir = None
     n_pages = 10

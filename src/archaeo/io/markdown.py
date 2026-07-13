@@ -27,7 +27,6 @@ def get_markdown_metadata(
         token = tokens[i]
 
         if token.type == "heading_open":
-            print(token)
             level = int(token.tag.lstrip("h"))
 
             if level <= max_outline_level:
