@@ -12,7 +12,7 @@ ProviderRegistry.register("ollama", lambda **kwargs: OllamaProvider(**kwargs))
 
 
 class OllamaProvider(BaseLlmProvider):
-    def __init__(self, model="gemma4:12b", host="http://localhost:11434"):
+    def __init__(self, model="qwen3.5:9b", host="http://localhost:11434"):
         super().__init__('ollama')
 
         self.model = model
@@ -51,10 +51,29 @@ class OllamaProvider(BaseLlmProvider):
     async def achat(self, messages, stream=False):
         raise NotImplementedError("Async Ollama not implemented yet")
 
-    def embed(self, text: str):
-        payload = {"model": self.model, "prompt": text}
-        resp = self._request("api/embeddings", payload)
-        return resp.json().get("embedding", [])
+    def embed_batch(self, texts: list[str], **kwargs) -> list[list[float]]:
+        if not texts:
+            return []
+
+        if any(not text.strip() for text in texts):
+            raise ValueError("embedding texts must not be empty")
+
+        payload = {
+            "model": self.model,
+            "input": texts,
+            **kwargs,
+        }
+
+        response = self._request("api/embed", payload)
+        embeddings = response.json().get("embeddings", [])
+
+        if len(embeddings) != len(texts):
+            raise ValueError(
+                "embedding count mismatch: "
+                f"expected={len(texts)}, actual={len(embeddings)}"
+            )
+
+        return embeddings
 
     def list_models(self) -> list[ModelInfo]:
         def _check_capabilities(name: str):
@@ -109,9 +128,10 @@ class OllamaProvider(BaseLlmProvider):
 
 
 if __name__ == '__main__':
-    llm = OllamaProvider('qwen3.5:9b')
-    resp = llm.chat(messages=[{'role': 'user', 'content': 'hello，世界。'}], stream=False, think=False)
-    print(resp)
+    import time
+    # llm = OllamaProvider('qwen3.5:9b')
+    # resp = llm.chat(messages=[{'role': 'user', 'content': 'hello，世界。'}], stream=False, think=False)
+    # print(resp)
 
     # print(llm.generate('1+1=?'))
 
@@ -121,6 +141,30 @@ if __name__ == '__main__':
     # import time
     # time.sleep(10)
 
-    for m in llm.list_models():
-        print(m)
-        print()
+    # for m in llm.list_models():
+    #     print(m)
+    #     print()
+
+    llm = OllamaProvider('qwen3-embedding:8b')  # 50: 3.75 vs. 8.75
+    start = time.time()
+    emb = llm.embed('hello, world')
+    # print(emb)
+
+    print(f'time elapsed: {time.time() - start}')
+
+    texts = ['写给非哲学家的哲学入门',
+             '如何快速了解一个行业',
+             'Naked Statistics',
+             'Introducing Bertrand Russell',
+             '契诃夫的一生 (伊莱娜·内米洛夫斯基, 2018)'] * 10
+    start = time.time()
+    embs = llm.embed_batch(texts)
+    print(embs[0][:5])
+    print(f'time elapsed: {time.time() - start}')
+
+    start = time.time()
+    embs = []
+    for text in texts:
+        embs.append(llm.embed(text))
+    print(embs[0][:5])
+    print(f'time elapsed: {time.time() - start}')

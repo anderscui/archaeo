@@ -93,8 +93,76 @@ class OpenRouterProvider(BaseLlmProvider):
     async def achat(self, messages, stream=False):
         raise NotImplementedError('Async OpenRouter not implemented yet')
 
-    def embed(self, text: str):
-        raise NotImplementedError(f'Embedding not implemented for {self.name}')
+    def embed_batch(self,
+                    texts: list[str],
+                    extra_headers: dict | None = None,
+                    **kwargs) -> list[list[float]]:
+        if not texts:
+            return []
+
+        if any(not isinstance(text, str) for text in texts):
+            raise TypeError("embedding inputs must be strings")
+
+        if any(not text.strip() for text in texts):
+            raise ValueError("embedding inputs must not be empty")
+
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+        }
+        if extra_headers is not None and isinstance(extra_headers, dict):
+            headers.update(extra_headers)
+
+        payload = {
+            "model": self.model,
+            "input": texts,
+            **kwargs,
+        }
+
+        resp = requests.post(
+            f"{self.base_url}/embeddings",
+            headers=headers,
+            json=payload,
+            timeout=30,
+        )
+        resp.raise_for_status()
+
+        result = resp.json()
+        data = result.get("data")
+
+        if not isinstance(data, list):
+            raise ValueError(
+                f"invalid embedding response: missing data list, response={result!r}"
+            )
+
+        if len(data) != len(texts):
+            raise ValueError(
+                "embedding count mismatch: "
+                f"expected={len(texts)}, actual={len(data)}"
+            )
+
+        try:
+            data.sort(key=lambda item: item["index"])
+
+            indices = [item["index"] for item in data]
+            expected_indices = list(range(len(texts)))
+            if indices != expected_indices:
+                raise ValueError(
+                    "invalid embedding indices: "
+                    f"expected={expected_indices}, actual={indices}"
+                )
+
+            embeddings = [item["embedding"] for item in data]
+        except (KeyError, TypeError) as exc:
+            raise ValueError(
+                f"invalid embedding response data: {data!r}"
+            ) from exc
+
+        if any(not isinstance(embedding, list) for embedding in embeddings):
+            raise ValueError("invalid embedding response: embedding must be a list")
+
+        return embeddings
 
     def list_models(self) -> list[ModelInfo]:
         def _parse_pricing(pricing: dict[str, str]) -> PricingInfo:
@@ -277,7 +345,7 @@ class OpenRouterModels:
     # embeddings
     openai_emb_3_large = 'openai/text-embedding-3-large'  # $0.13
     openai_emb_3_small = 'openai/text-embedding-3-small'  # $0.02
-    openai_emb_2_ada = 'openai/text-embedding-ada-002' # $0.10
+    openai_emb_2_ada = 'openai/text-embedding-ada-002' # $0.10, legacy
 
     claude_fable_5 = 'anthropic/claude-fable-5'  # $10-50, 2026.06
     claude_opus_4_8_fast = 'anthropic/claude-opus-4.8-fast'  # $10-50, 2026.05
@@ -346,7 +414,7 @@ class OpenRouterModels:
 
     qwen3_emb_8b = 'qwen/qwen3-embedding-8b'  # $0.01
     qwen3_emb_4b = 'qwen/qwen3-embedding-4b'  # $0.02
-    qwen3_emb_06b = 'qwen/qwen3-embedding-0.6b'  # $0.01
+    # qwen3_emb_06b = 'qwen/qwen3-embedding-0.6b'  # $0.01
 
     qwen3_asr_flash_2602 = 'qwen/qwen3-asr-flash-2026-02-10'  # audio -> transcription, $$0.000035/second, 2026.05
 
@@ -391,22 +459,55 @@ class OpenRouterModels:
 
     mistral_mini_transcribe = 'mistralai/voxtral-mini-transcribe'  # audio -> transcription, $$0.003/second, 2026.05
 
+    pplx_emb_v1_06b = 'perplexity/pplx-embed-v1-0.6b'
+    pplx_emb_v1_4b = 'perplexity/pplx-embed-v1-4b'
+
 
 if __name__ == '__main__':
+    import time
     from archaeo.io.files import json_dump
 
-    llm = OpenRouterProvider(OpenRouterModels.qwen3_6_plus)
-    resp = llm.chat(messages=[{'role': 'user', 'content': '请给我将一个关于程序员的笑话，用英语。'}], stream=False)
-    print(resp)
+    # llm = OpenRouterProvider(OpenRouterModels.qwen3_6_plus)
+    # resp = llm.chat(messages=[{'role': 'user', 'content': '请给我将一个关于程序员的笑话，用英语。'}], stream=False)
+    # print(resp)
 
     # resp = llm.chat(messages=[{'role': 'user', 'content': 'hello，世界。'}], stream=True)
     # for chunk in resp:
     #     print(chunk, end='')
 
-    all_models = llm.list_models()
-    model_data = [model.model_dump(mode='json') for model in all_models]
-    json_dump(model_data, '~/Downloads/openrouter_model_info.json', indent=2)
+    # all_models = llm.list_models()
+    # model_data = [model.model_dump(mode='json') for model in all_models]
+    # json_dump(model_data, '~/Downloads/openrouter_model_info.json', indent=2)
+    #
+    # for m in llm.list_models()[:1000]:
+    #     print(m)
+    #     print()
 
-    for m in llm.list_models()[:1000]:
-        print(m)
-        print()
+    # llm = OpenRouterProvider(OpenRouterModels.pplx_emb_v1_06b)  # 10: 1.3 vs 13
+    # llm = OpenRouterProvider(OpenRouterModels.pplx_emb_v1_4b)  # 10: 1.8 vs 13
+    # llm = OpenRouterProvider(OpenRouterModels.openai_emb_3_small) # 10: 2.5 vs. 15
+    llm = OpenRouterProvider(OpenRouterModels.openai_emb_3_large) # 10: 2.6 vs. 17
+    # llm = OpenRouterProvider(OpenRouterModels.gemini_emb_2) # 10: 2.75 vs. 16
+    # llm = OpenRouterProvider(OpenRouterModels.qwen3_emb_8b) # 10: 27 vs. 152
+    start = time.time()
+    emb = llm.embed('hello, world')
+    # print(emb)
+
+    print(f'time elapsed: {time.time() - start}')
+
+    texts = ['写给非哲学家的哲学入门',
+             '如何快速了解一个行业',
+             'Naked Statistics',
+             'Introducing Bertrand Russell',
+             '契诃夫的一生 (伊莱娜·内米洛夫斯基, 2018)'] * 2
+    start = time.time()
+    embs = llm.embed_batch(texts)
+    print(embs[0][:10])
+    print(f'time elapsed: {time.time() - start}')
+
+    start = time.time()
+    embs = []
+    for text in texts:
+        embs.append(llm.embed(text))
+    print(embs[0][:10])
+    print(f'time elapsed: {time.time() - start}')

@@ -68,8 +68,16 @@ class BaseLlmProvider(BaseProvider):
         messages = [{"role": "user", "content": text}]
         return self.chat(messages, stream=False, **kwargs)
 
+    def embed(self, text: str, **kwargs) -> list[float]:
+        if not text.strip():
+            raise ValueError("embedding text must not be empty")
+        embeddings = self.embed_batch([text], **kwargs)
+        if len(embeddings) != 1:
+            raise ValueError(f"expected 1 embedding, got {len(embeddings)}")
+        return embeddings[0]
+
     @abstractmethod
-    def embed(self, text: str) -> list[float]:
+    def embed_batch(self, texts: list[str], **kwargs) -> list[list[float]]:
         raise NotImplementedError
 
     def count_tokens(self, text: str, bytes_per_token: int = 4) -> int:
