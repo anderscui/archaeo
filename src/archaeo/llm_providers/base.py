@@ -53,8 +53,9 @@ class BaseProvider(ABC):
 class BaseLlmProvider(BaseProvider):
     """Abstract base provider for all LLM backends."""
 
-    def __init__(self, name: str):
+    def __init__(self, name: str, model: str):
         self.name = name
+        self.model = model
 
     @abstractmethod
     def chat(self, messages: list[dict[str, str]], stream: bool = False, think: bool | None = False, **kwargs) -> Any:

@@ -34,9 +34,8 @@ ProviderRegistry.register("qwen", lambda **kwargs: QwenProvider(**kwargs))
 
 class QwenProvider(BaseLlmProvider):
     def __init__(self, model='qwen-plus', api_key=None):
-        super().__init__('qwen')
+        super().__init__('qwen', model)
 
-        self.model = model
         self.api_key = api_key or os.getenv('DASHSCOPE_API_KEY', '')
         self.base_url = 'https://dashscope.aliyuncs.com/compatible-mode/v1'
         logger.debug(f'{self.name} model {self.model} initialized')

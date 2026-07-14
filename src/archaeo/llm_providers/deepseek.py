@@ -17,9 +17,8 @@ ProviderRegistry.register("deepseek", lambda **kwargs: DeepSeekProvider(**kwargs
 
 class DeepSeekProvider(BaseLlmProvider):
     def __init__(self, model='deepseek-chat', api_key=None):
-        super().__init__('deepseek')
+        super().__init__('deepseek', model)
 
-        self.model = model
         self.api_key = api_key or os.getenv('DEEPSEEK_API_KEY', '')
         self.base_url = 'https://api.deepseek.com'
         logger.debug(f'{self.name} model {self.model} initialized')

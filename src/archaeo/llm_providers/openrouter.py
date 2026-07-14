@@ -13,9 +13,8 @@ ProviderRegistry.register("openrouter", lambda **kwargs: OpenRouterProvider(**kw
 
 class OpenRouterProvider(BaseLlmProvider):
     def __init__(self, model='openai/gpt-4o-mini', api_key=None):
-        super().__init__('openrouter')
+        super().__init__('openrouter', model)
 
-        self.model = model
         self.api_key = api_key or os.getenv('OPENROUTER_API_KEY', '')
         self.base_url = 'https://openrouter.ai/api/v1'
         logger.debug(f'{self.name} model {self.model} initialized')
