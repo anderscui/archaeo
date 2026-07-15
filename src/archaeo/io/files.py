@@ -120,6 +120,11 @@ def get_file_blocks(path: str | Path) -> int:
     return path.stat(follow_symlinks=False).st_blocks
 
 
+def is_relative_to_any(path: str | Path, paths: list[Path]):
+    path = get_absolute_path(path)
+    return any(path.is_relative_to(op) for op in paths)
+
+
 def get_file_hash(
     path: str | Path,
     algorithm: str = "sha256",
@@ -314,3 +319,7 @@ def zip_dir(
             )
 
     return output_file
+
+
+if __name__ == '__main__':
+    assert is_relative_to_any('~/Downloads/', [Path('/Users/andersc/Downloads')])

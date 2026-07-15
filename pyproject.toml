@@ -30,6 +30,7 @@ classifiers = [
 ]
 
 dependencies = [
+    "arrow>=1.4.0",
     "loguru>=0.7.3",
     "lz4>=4.4.5",
     "markdown-it-py>=4.2.0",
