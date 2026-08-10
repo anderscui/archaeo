@@ -277,22 +277,20 @@ class OpenRouterProvider(BaseLlmProvider):
 
 
 class OpenRouterModels:
-    gpt_audio = 'openai/gpt-audio'  # $2.5-10, 2026.01
-    gpt_audio_mini = 'openai/gpt-audio-mini'  # $0.6-2.4, 2026.01
     gpt_5_6_luna_pro = 'openai/gpt-5.6-luna-pro'  # $1-6, 2026.07
     gpt_5_6_luna = 'openai/gpt-5.6-luna'  # $1-6, 2026.07
     gpt_5_6_terra_pro = 'openai/gpt-5.6-terra-pro'  # $2.5-15, 2026.07
     gpt_5_6_terra = 'openai/gpt-5.6-terra'  # $2.5-15, 2026.07
     gpt_5_6_sol_pro = 'openai/gpt-5.6-sol-pro'  # $5-30, 2026.07
     gpt_5_6_sol = 'openai/gpt-5.6-sol'  # $5-30, 2026.07
-    gpt_5_5_pro = 'openai/gpt-5.5-pro'  # $30-180, 2026.04
-    gpt_5_5 = 'openai/gpt-5.5'  # $5-30, 2026.04
-    gpt_5_4_pro = 'openai/gpt-5.4-pro'  # $30-180, $10/K web search, 2026.03
-    gpt_5_4 = 'openai/gpt-5.4'  # $2.5-15, $10/K web search, 2026.03
-    gpt_5_4_mini = 'openai/gpt-5.4-mini'  # $0.75-4.5, $10/K web search, 2026.03
+    # gpt_5_5_pro = 'openai/gpt-5.5-pro'  # $30-180, 2026.04
+    # gpt_5_5 = 'openai/gpt-5.5'  # $5-30, 2026.04
+    # gpt_5_4_pro = 'openai/gpt-5.4-pro'  # $30-180, $10/K web search, 2026.03
+    # gpt_5_4 = 'openai/gpt-5.4'  # $2.5-15, $10/K web search, 2026.03
+    # gpt_5_4_mini = 'openai/gpt-5.4-mini'  # $0.75-4.5, $10/K web search, 2026.03
     gpt_5_4_nano = 'openai/gpt-5.4-nano'  # $0.2-1.25, $10/K web search, 2026.03
-    gpt_5_3_chat = 'openai/gpt-5.3-chat'  # $1.75-14, $100/K web search, 2026.03
-    gpt_5_3_codex = 'openai/gpt-5.3-codex'  # $1.75-14, $10/K web search, 2026.02
+    # gpt_5_3_chat = 'openai/gpt-5.3-chat'  # $1.75-14, $100/K web search, 2026.03
+    # gpt_5_3_codex = 'openai/gpt-5.3-codex'  # $1.75-14, $10/K web search, 2026.02
     # gpt_5_2_codex = 'openai/gpt-5.2-codex'  # $1.75-14, $10/K web search, 2026.01
     # gpt_5_2 = 'openai/gpt-5.2'  # $1.75-14, $10/K web search, 2025.12
     # gpt_5_2_chat = 'openai/gpt-5.2-chat'  # $1.75-14, $10/K web search, 2025.12, GPT-5.2 Instant
@@ -302,7 +300,7 @@ class OpenRouterModels:
     # gpt_5_1_chat = 'openai/gpt-5.1-chat'  # $1.25-10, $10/K web search, 2025.11
     # gpt_5_1_codex = 'openai/gpt-5.1-codex'  # $1.25-10, 2025.11
 
-    gpt_5 = 'openai/gpt-5'  # coding  # $1.25-10, 2025.08
+    # gpt_5 = 'openai/gpt-5'  # coding  # $1.25-10, 2025.08
     # gpt_5_mini = 'openai/gpt-5-mini'  # $0.25-2, 2025.08
     # gpt_5_nano = 'openai/gpt-5-nano'  # $0.05-0.4, 2025.08
     # gpt_5_pro = 'openai/gpt-5-pro'  # $15-120, 2025.10
@@ -316,10 +314,13 @@ class OpenRouterModels:
     gpt_whisper_large_3_turbo = 'openai/whisper-large-v3-turbo'  # speech recognition, $0.04/hour, 2026.05
     gpt_whisper_large_3 = 'openai/whisper-large-v3'  # speech recognition, $0.111/hour, 2026.05
     gpt_whisper_1 = 'openai/whisper-1'  # speech recognition, $0.006/minute, 2026.04
+    gpt_transcribe = 'openai/gpt-transcribe'  # stt, $0.0045/minute, 2026.08
     gpt_4o_transcribe_mini = 'openai/gpt-4o-mini-transcribe'  # speech-to-text, $1.25/M, 2026.05
     gpt_4o_transcribe = 'openai/gpt-4o-transcribe'  # speech-to-text, $2.5/M, 2026.04
     gpt_4o_audio = 'openai/gpt-4o-audio-preview'  # $2.5-10, 2025.08
     gpt_4o_mini_tts = 'openai/gpt-4o-mini-tts-2025-12-15'  # $0.6/M, 2026.04
+    gpt_audio = 'openai/gpt-audio'  # $2.5-10, 2026.01
+    gpt_audio_mini = 'openai/gpt-audio-mini'  # $0.6-2.4, 2026.01
 
     gpt_image_2 = 'openai/gpt-image-2'  # $8-8, 2026.06
     gpt_image_1_mini = 'openai/gpt-image-1-mini'  # $2.5-2.5, 2026.06
@@ -362,7 +363,7 @@ class OpenRouterModels:
     # claude_sonnet_4_5 = 'anthropic/claude-sonnet-4.5'  # coding, $3-15, 2025.09
     # claude_sonnet_4 = 'anthropic/claude-sonnet-4'  # image, coding, $3-15, 2025.05
     # claude_sonnet_3_7 = 'anthropic/claude-3.7-sonnet'  # 2025.02
-    # claude_haiku_4_5 = 'anthropic/claude-haiku-4.5'  # coding, $1-5, 2025.10
+    claude_haiku_4_5 = 'anthropic/claude-haiku-4.5'  # coding, $1-5, 2025.10
     # claude_haiku_3_5 = 'anthropic/claude-3.5-haiku'  # fastest model for daily tasks, 2024.11
 
     # google: translation, coding
@@ -398,6 +399,7 @@ class OpenRouterModels:
     # gemma_4_26b = 'google/gemma-4-26b-a4b-it'
 
     # qwen
+    qwen3_8_max = 'qwen/qwen3.8-max'  # $2-6, 2026.08
     qwen3_7_plus = 'qwen/qwen3.7-plus'  # $0.4-1.6, 2026.06
     qwen3_7_max = 'qwen/qwen3.7-max'  # $2.5-7.5, 2026.05
     qwen3_7_flash = 'qwen/qwen3.7-flash'  # $0.03-0.13, 2026.07
@@ -420,6 +422,8 @@ class OpenRouterModels:
     qwen3_emb_4b = 'qwen/qwen3-embedding-4b'  # $0.02
     # qwen3_emb_06b = 'qwen/qwen3-embedding-0.6b'  # $0.01
 
+    qwen_image_3 = 'qwen/qwen-image-3'  # $0.03/image, 2026.08
+    qwen_image_3_pro = 'qwen/qwen-image-3-pro'  # $0.04/image, 2026.08
     qwen3_audio_tts_plus_3 = 'qwen/qwen-audio-3.0-tts-plus'  # text -> speech, $20/M chars, 2026.07
     qwen3_audio_tts_flash_3 = 'qwen/qwen-audio-3.0-tts-flash'  # text -> speech, $15/M chars, 2026.07
     qwen3_asr_flash_2602 = 'qwen/qwen3-asr-flash-2026-02-10'  # audio -> transcription, $0.000035/second, 2026.05
@@ -437,7 +441,7 @@ class OpenRouterModels:
     glm_5_2 = 'z-ai/glm-5.2'  # coding, $0.42-1.32, 2026.06
     # glm_5_1 = 'z-ai/glm-5.1'  # coding, $1.05-3.5, 2026.04
     glm_5v_turbo = 'z-ai/glm-5v-turbo'  # mm agent, $1.2-4, 2026.04
-    glm_5_turbo = 'z-ai/glm-5-turbo'  # $1.2-4, 2026.03
+    # glm_5_turbo = 'z-ai/glm-5-turbo'  # $1.2-4, 2026.03
     glm_5 = 'z-ai/glm-5'  # $0.6-2.08, 2026.02
     # glm_4_7_flash = 'z-ai/glm-4.7-flash'  # $0.06-0.4, 2026.01
     # glm_4_7 = 'z-ai/glm-4.7'  # coding, $0.4-1.5, 2025.12
@@ -466,6 +470,7 @@ class OpenRouterModels:
     grok_img_video = 'x-ai/grok-imagine-video'  # text/image -> video, $0.05/second, 2026.05
     grok_img_video_1_5 = 'x-ai/grok-imagine-video-1.5'  # text/image -> video, $0.08/second, 2026.07
 
+    meta_muse_spark_1_2 = 'meta/muse-spark-1.2'  # $1.25-4.25, 2026.08
     meta_muse_spark_1_1 = 'meta/muse-spark-1.1'  # $1.25-4.25, 2026.07
 
     mai_voice_2 = 'microsoft/mai-voice-2-flash'  # tts, $15/M, 2026.07
@@ -485,6 +490,8 @@ class OpenRouterModels:
     voyage_emb_mm_3_5 = 'voyageai/voyage-multimodal-3.5'  # text/image -> emb, $0.6/M, 2026.07, dim: 2048, 1024, 512, and 256
     voyage_rerank_2_5 = 'voyageai/rerank-2.5'  # text -> rerank, $0.05/M, 2026.07 (original: 2025.08)
     voyage_rerank_2_5_lite = 'voyageai/rerank-2.5-lite'  # text -> rerank, $0.02/M, 2026.07 (original: 2025.08)
+
+    flux_video_3 = 'black-forest-labs/flux-3-video'  # $0.17/second, 2026.08
 
 
 if __name__ == '__main__':
