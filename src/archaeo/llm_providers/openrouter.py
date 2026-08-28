@@ -367,6 +367,8 @@ class OpenRouterModels:
     # claude_haiku_3_5 = 'anthropic/claude-3.5-haiku'  # fastest model for daily tasks, 2024.11
 
     # google: translation, coding
+    gemini_flash_3_7_batch = 'google/gemini-3.7-flash:batch'  # mm, $0.75-3.75, 2026.08
+    gemini_flash_3_7 = 'google/gemini-3.7-flash'  # mm, $1.5-7.5, 2026.08
     gemini_flash_3_6 = 'google/gemini-3.6-flash'  # mm, $1.5-7.5, 2026.07
     gemini_flash_lite_3_5 = 'google/gemini-3.5-flash-lite'  # mm(text, image, video, file, audio), $0.3-2.5, 2026.07
     gemini_flash_3_5 = 'google/gemini-3.5-flash'  # mm(text, image, video, file, audio), $1.5-9, 2026.05
@@ -400,6 +402,8 @@ class OpenRouterModels:
 
     # qwen
     qwen3_8_max = 'qwen/qwen3.8-max'  # $2-6, 2026.08
+    qwen3_8_flash = 'qwen/qwen3.8-flash'  # $0.16-0.47, 2026.08
+    qwen3_8_27b = 'qwen/qwen3.8-27b'  # $0.35-2.75, 2026.08
     qwen3_7_plus = 'qwen/qwen3.7-plus'  # $0.4-1.6, 2026.06
     qwen3_7_max = 'qwen/qwen3.7-max'  # $2.5-7.5, 2026.05
     qwen3_7_flash = 'qwen/qwen3.7-flash'  # $0.03-0.13, 2026.07
@@ -421,13 +425,18 @@ class OpenRouterModels:
     qwen3_emb_8b = 'qwen/qwen3-embedding-8b'  # $0.01
     qwen3_emb_4b = 'qwen/qwen3-embedding-4b'  # $0.02
     # qwen3_emb_06b = 'qwen/qwen3-embedding-0.6b'  # $0.01
+    qwen3_reranker_8b = 'qwen/qwen3-reranker-8b'  # reranker, $0.2, 2026.08
 
     qwen_image_3 = 'qwen/qwen-image-3'  # $0.03/image, 2026.08
     qwen_image_3_pro = 'qwen/qwen-image-3-pro'  # $0.04/image, 2026.08
     qwen3_audio_tts_plus_3 = 'qwen/qwen-audio-3.0-tts-plus'  # text -> speech, $20/M chars, 2026.07
     qwen3_audio_tts_flash_3 = 'qwen/qwen-audio-3.0-tts-flash'  # text -> speech, $15/M chars, 2026.07
+    qwen3_asr_17b = 'qwen/qwen3-asr-1.7b'  # audio -> transcription, $0.000008/second, 2026.08
+    qwen3_asr_06b = 'qwen/qwen3-asr-0.6b'  # audio -> transcription, $0.000003/second, 2026.08
     qwen3_asr_flash_2602 = 'qwen/qwen3-asr-flash-2026-02-10'  # audio -> transcription, $0.000035/second, 2026.05
 
+    deepseek_v4_pro_0813 = 'deepseek/deepseek-v4-pro-0813'  # , $1.115-3.346, 2026.08
+    deepseek_v4_flash_vision_exp = 'deepseek/deepseek-v4-flash-vision-exp'  # , $0.44-1.32, 2026.08
     deepseek_v4_flash_0731 = 'deepseek/deepseek-v4-flash-0731'  # , $0.09-0.18, 2026.07
     # deepseek_v4_flash = 'deepseek/deepseek-v4-flash'  # , $0.0868-0.1736, 2026.04
     deepseek_v4_pro = 'deepseek/deepseek-v4-pro'  # , $0.435-0.87, 2026.04
@@ -438,7 +447,9 @@ class OpenRouterModels:
     # kimi_k2_6 = 'moonshotai/kimi-k2.6'  # coding, $0.75-3.5 2026.04
     # kimi_k2_5 = 'moonshotai/kimi-k2.5'  # coding, $0.44-2 2026.01
 
-    glm_5_2 = 'z-ai/glm-5.2'  # coding, $0.42-1.32, 2026.06
+    glm_5_3 = 'z-ai/glm-5.3'  # $1.4-4.4, 2026.08
+    glm_5_3_flash = 'z-ai/glm-5.3-flash'  # $0.075-0.25, 2026.08
+    glm_5_2 = 'z-ai/glm-5.2'  # $0.4875-1.56, 2026.06
     # glm_5_1 = 'z-ai/glm-5.1'  # coding, $1.05-3.5, 2026.04
     glm_5v_turbo = 'z-ai/glm-5v-turbo'  # mm agent, $1.2-4, 2026.04
     # glm_5_turbo = 'z-ai/glm-5-turbo'  # $1.2-4, 2026.03
@@ -457,6 +468,7 @@ class OpenRouterModels:
     minimax_hailuo_3 = 'minimax/hailuo-3' # text/image/audio/video -> video, $0.13/second, 2026.07
 
     grok_build_01 = 'x-ai/grok-build-0.1'  # coding, text/image -> text, $1-2, 2026.05
+    grok_4_6 = 'x-ai/grok-4.6'  # mm, $2-6, 2026.08
     grok_4_5 = 'x-ai/grok-4.5'  # $2-6, 2026.07
     # grok_4_3 = 'x-ai/grok-4.3'  # $1.25-2.5, 2026.05
     grok_4_20_multi_agent = 'x-ai/grok-4.20-multi-agent'  # $2-6, 2026.03
@@ -466,12 +478,14 @@ class OpenRouterModels:
 
     grok_stt_1 = 'x-ai/grok-stt-1.0'  # audio -> transcription, $0.1/hour, 2026.07
     grok_voice_tts_1 = 'x-ai/grok-voice-tts-1.0'  # text -> audio, $15/M, 2026.05
+    grok_img_img_2 = 'x-ai/grok-imagine-image-2.0'  # text/image -> image, $0.04/image, 2026.08
     grok_img_img = 'x-ai/grok-imagine-image-quality'  # text/image -> image, $0.05/image, 2026.05
     grok_img_video = 'x-ai/grok-imagine-video'  # text/image -> video, $0.05/second, 2026.05
     grok_img_video_1_5 = 'x-ai/grok-imagine-video-1.5'  # text/image -> video, $0.08/second, 2026.07
 
     meta_muse_spark_1_2 = 'meta/muse-spark-1.2'  # $1.25-4.25, 2026.08
     meta_muse_spark_1_1 = 'meta/muse-spark-1.1'  # $1.25-4.25, 2026.07
+    meta_muse_image = 'meta/muse-image'  # $0.01/image, 2026.08
 
     mai_voice_2 = 'microsoft/mai-voice-2-flash'  # tts, $15/M, 2026.07
     mai_voice_2 = 'microsoft/mai-voice-2'  # tts, $22/M, 2026.06
@@ -491,7 +505,16 @@ class OpenRouterModels:
     voyage_rerank_2_5 = 'voyageai/rerank-2.5'  # text -> rerank, $0.05/M, 2026.07 (original: 2025.08)
     voyage_rerank_2_5_lite = 'voyageai/rerank-2.5-lite'  # text -> rerank, $0.02/M, 2026.07 (original: 2025.08)
 
+    hy_mt2_18b = 'tencent/hy-mt2-1.8b'  # translation+dialects, $0.044-0.177, 2026.08
+    hy_mt2_7b = 'tencent/hy-mt2-7b'  # translation+dialects, $0.074-0.295, 2026.08
+    hy_mt2_30b = 'tencent/hy-mt2-30b-a3b'  # translation+dialects, $0.074-0.295, 2026.08
+
+    lfm_emb_2_5_350m = 'liquid/lfm-2.5-embedding-350m:free'  # 350m, free, 2026.08
     flux_video_3 = 'black-forest-labs/flux-3-video'  # $0.17/second, 2026.08
+    flux_video_upscale = 'black-forest-labs/flux-video-upscale'  # text/video->video, $0.075/megapixel, 2026.08
+
+    ali_wan_3_prime = 'alibaba/wan-3.0-prime'  # video gen, $0.068/second, 2026.08
+    ali_wan_3 = 'alibaba/wan-3.0'  # video gen, $0.0425/second, 2026.08
 
 
 if __name__ == '__main__':
