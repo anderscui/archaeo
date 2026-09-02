@@ -33,7 +33,7 @@ def list_files(
         # exclude all files under .git dir.
         list_files(".", excludes=lambda p: ".git" in p.parts)
     """
-    directory = Path(directory).expanduser().resolve()
+    directory = get_absolute_path(directory)
     if not directory.is_dir():
         raise ValueError(f"Directory not found: {directory}")
 
@@ -319,6 +319,19 @@ def zip_dir(
             )
 
     return output_file
+
+
+def compare_dirs(dir1: str| Path, dir2: str | Path) -> bool:
+    dir1 = get_absolute_path(dir1)
+    dir2 = get_absolute_path(dir2)
+    files1 = list(list_files(dir1))
+    files2 = list(list_files(dir2))
+    if len(files1) != len(files2):
+        return False
+
+    hashes1 = sorted([get_file_hash(f) for f in files1])
+    hashes2 = sorted([get_file_hash(f) for f in files2])
+    return hashes1 == hashes2
 
 
 if __name__ == '__main__':
