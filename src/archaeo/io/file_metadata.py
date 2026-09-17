@@ -5,24 +5,12 @@ from archaeo import logger
 from archaeo.io.audio import get_audio_metadata
 from archaeo.io.docs import LocalFileMetadata
 from archaeo.io.epub import get_epub_metadata
-from archaeo.io.files import get_absolute_path
-from archaeo.io.image import get_image_metadata
+from archaeo.io.files import get_absolute_path, IMAGE_EXTENSIONS, AUDIO_EXTENSIONS, VIDEO_EXTENSIONS
+from archaeo.io.images import get_image_metadata
 from archaeo.io.markdown import get_markdown_metadata
 from archaeo.io.office import get_docx_metadata
 from archaeo.io.pdf import get_pdf_metadata
 from archaeo.io.video import get_video_metadata
-
-AUDIO_EXTENSIONS = {
-    "mp3", "wav", "aiff", "aif", "flac", "m4a", "aac", "ogg",
-}
-
-VIDEO_EXTENSIONS = {
-    "mp4", "m4v", "mov", "mkv", "avi", "wmv", "flv", "mpg", "mpeg",
-}
-
-IMAGE_EXTENSIONS = {
-    "png", "jpg", "jpeg", "gif", "webp", "bmp", "heic", "heif",
-}
 
 
 def get_local_file_metadata(file_path: str | Path) -> LocalFileMetadata:

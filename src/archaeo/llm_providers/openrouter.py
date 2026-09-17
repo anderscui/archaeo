@@ -277,12 +277,16 @@ class OpenRouterProvider(BaseLlmProvider):
 
 
 class OpenRouterModels:
-    gpt_5_6_luna_pro = 'openai/gpt-5.6-luna-pro'  # $1-6, 2026.07
-    gpt_5_6_luna = 'openai/gpt-5.6-luna'  # $1-6, 2026.07
-    gpt_5_6_terra_pro = 'openai/gpt-5.6-terra-pro'  # $2.5-15, 2026.07
-    gpt_5_6_terra = 'openai/gpt-5.6-terra'  # $2.5-15, 2026.07
-    gpt_5_6_sol_pro = 'openai/gpt-5.6-sol-pro'  # $5-30, 2026.07
-    gpt_5_6_sol = 'openai/gpt-5.6-sol'  # $5-30, 2026.07
+    gpt_6_astra_pro = 'openai/gpt-6-astra-pro'  # $10-50, 2026.09
+    gpt_6_astra_pro_batch = 'openai/gpt-6-astra-pro:batch'  # $5-25, 2026.09
+    gpt_6_astra = 'openai/gpt-6-astra'  # $10-50, 2026.09
+    gpt_6_astra_batch = 'openai/gpt-6-astra:batch'  # $5-25, 2026.09
+    gpt_5_6_luna_pro = 'openai/gpt-5.6-luna-pro'  # $0.2-1.2, 2026.07
+    gpt_5_6_luna = 'openai/gpt-5.6-luna'  # $0.2-1.2, 2026.07
+    gpt_5_6_terra_pro = 'openai/gpt-5.6-terra-pro'  # $2-12, 2026.07
+    gpt_5_6_terra = 'openai/gpt-5.6-terra'  # $2-12, 2026.07
+    gpt_5_6_sol_pro = 'openai/gpt-5.6-sol-pro'  # $4-20, 2026.07
+    gpt_5_6_sol = 'openai/gpt-5.6-sol'  # $4-20, 2026.07
     # gpt_5_5_pro = 'openai/gpt-5.5-pro'  # $30-180, 2026.04
     # gpt_5_5 = 'openai/gpt-5.5'  # $5-30, 2026.04
     # gpt_5_4_pro = 'openai/gpt-5.4-pro'  # $30-180, $10/K web search, 2026.03
@@ -322,6 +326,8 @@ class OpenRouterModels:
     gpt_audio = 'openai/gpt-audio'  # $2.5-10, 2026.01
     gpt_audio_mini = 'openai/gpt-audio-mini'  # $0.6-2.4, 2026.01
 
+    gpt_image_2_5_sunburst = 'openai/gpt-image-2.5-sunburst'  # $8-30, 2026.09
+    gpt_image_2_5_flare = 'openai/gpt-image-2.5-flare'  # $8-30, 2026.09
     gpt_image_2 = 'openai/gpt-image-2'  # $8-8, 2026.06
     gpt_image_1_mini = 'openai/gpt-image-1-mini'  # $2.5-2.5, 2026.06
     gpt_image_1 = 'openai/gpt-image-1'  # $10-10, 2026.06
@@ -347,6 +353,8 @@ class OpenRouterModels:
     openai_emb_3_small = 'openai/text-embedding-3-small'  # $0.02
     openai_emb_2_ada = 'openai/text-embedding-ada-002' # $0.10, legacy
 
+    claude_fable_5_1_batch = 'anthropic/claude-fable-5.1:batch'  # $5-25, 2026.09
+    claude_fable_5_1 = 'anthropic/claude-fable-5.1'  # $10-50, 2026.09
     claude_fable_5 = 'anthropic/claude-fable-5'  # $10-50, 2026.06
     claude_opus_5_fast = 'anthropic/claude-opus-5-fast'  # $10-50, 2026.07
     claude_opus_5 = 'anthropic/claude-opus-5'  # $5-25, 2026.07
@@ -367,14 +375,16 @@ class OpenRouterModels:
     # claude_haiku_3_5 = 'anthropic/claude-3.5-haiku'  # fastest model for daily tasks, 2024.11
 
     # google: translation, coding
+    gemini_flash_3_8_batch = 'google/gemini-3.8-flash:batch'  # mm, $0.75-3.75, 2026.09
+    gemini_flash_3_8 = 'google/gemini-3.8-flash'  # mm, $1.5-7.5, 2026.09
     gemini_flash_3_7_batch = 'google/gemini-3.7-flash:batch'  # mm, $0.75-3.75, 2026.08
     gemini_flash_3_7 = 'google/gemini-3.7-flash'  # mm, $1.5-7.5, 2026.08
-    gemini_flash_3_6 = 'google/gemini-3.6-flash'  # mm, $1.5-7.5, 2026.07
+    gemini_flash_3_6 = 'google/gemini-3.6-flash'  # mm, $0.75-3.75, 2026.07
     gemini_flash_lite_3_5 = 'google/gemini-3.5-flash-lite'  # mm(text, image, video, file, audio), $0.3-2.5, 2026.07
     gemini_flash_3_5 = 'google/gemini-3.5-flash'  # mm(text, image, video, file, audio), $1.5-9, 2026.05
     gemini_flash_lite_3_1 = 'google/gemini-3.1-flash-lite'  # mm(text, image, video, file, audio), $0.25-1.5, 2026.05
-    gemini_pro_3_1 = 'google/gemini-3.1-pro-preview'  # $2-12, 2026.02
-    gemini_pro_3_1_tools = 'google/gemini-3.1-pro-preview-customtools'  # $2-12, 2026.02
+    # gemini_pro_3_1 = 'google/gemini-3.1-pro-preview'  # $2-12, 2026.02
+    # gemini_pro_3_1_tools = 'google/gemini-3.1-pro-preview-customtools'  # $2-12, 2026.02
     # gemini_flash_3 = 'google/gemini-3-flash-preview'  # $0.5-3, 2025.12
     # gemini_flash_2_5 = 'google/gemini-2.5-flash'  # translation, $0.3-2.5, 2025.06
     # gemini_flash_lite_2_5 = 'google/gemini-2.5-flash-lite'  # translation, $0.1-0.4, 2025.07
@@ -401,12 +411,13 @@ class OpenRouterModels:
     # gemma_4_26b = 'google/gemma-4-26b-a4b-it'
 
     # qwen
+    qwen3_8_max_0902 = 'qwen/qwen3.8-max-0902'  # $2-6, 2026.09
     qwen3_8_max = 'qwen/qwen3.8-max'  # $2-6, 2026.08
-    qwen3_8_flash = 'qwen/qwen3.8-flash'  # $0.16-0.47, 2026.08
+    qwen3_8_flash = 'qwen/qwen3.8-flash'  # $0.16-0.47, 2026.08, cheap
     qwen3_8_27b = 'qwen/qwen3.8-27b'  # $0.35-2.75, 2026.08
     qwen3_7_plus = 'qwen/qwen3.7-plus'  # $0.4-1.6, 2026.06
     qwen3_7_max = 'qwen/qwen3.7-max'  # $2.5-7.5, 2026.05
-    qwen3_7_flash = 'qwen/qwen3.7-flash'  # $0.03-0.13, 2026.07
+    qwen3_7_flash = 'qwen/qwen3.7-flash'  # $0.03-0.13, 2026.07, cheap
     # qwen3_6_max = 'qwen/qwen3.6-max-preview'  # $1.3-7.8, 2026.04
     # qwen3_6_plus = 'qwen/qwen3.6-plus'  # $0.325-1.95, 2026.04
     # qwen3_6_flash = 'qwen/qwen3.6-flash'  # 0.25-1.5, 2026.04
@@ -435,6 +446,7 @@ class OpenRouterModels:
     qwen3_asr_06b = 'qwen/qwen3-asr-0.6b'  # audio -> transcription, $0.000003/second, 2026.08
     qwen3_asr_flash_2602 = 'qwen/qwen3-asr-flash-2026-02-10'  # audio -> transcription, $0.000035/second, 2026.05
 
+    deepseek_v4_1_flash = 'deepseek/deepseek-v4.1-flash'  # , $0.15-0.6, 2026.09
     deepseek_v4_pro_0813 = 'deepseek/deepseek-v4-pro-0813'  # , $1.115-3.346, 2026.08
     deepseek_v4_flash_vision_exp = 'deepseek/deepseek-v4-flash-vision-exp'  # , $0.44-1.32, 2026.08
     deepseek_v4_flash_0731 = 'deepseek/deepseek-v4-flash-0731'  # , $0.09-0.18, 2026.07
@@ -448,7 +460,7 @@ class OpenRouterModels:
     # kimi_k2_5 = 'moonshotai/kimi-k2.5'  # coding, $0.44-2 2026.01
 
     glm_5_3 = 'z-ai/glm-5.3'  # $1.4-4.4, 2026.08
-    glm_5_3_flash = 'z-ai/glm-5.3-flash'  # $0.075-0.25, 2026.08
+    glm_5_3_flash = 'z-ai/glm-5.3-flash'  # $0.075-0.25, 2026.08, cheap
     glm_5_2 = 'z-ai/glm-5.2'  # $0.4875-1.56, 2026.06
     # glm_5_1 = 'z-ai/glm-5.1'  # coding, $1.05-3.5, 2026.04
     glm_5v_turbo = 'z-ai/glm-5v-turbo'  # mm agent, $1.2-4, 2026.04
@@ -465,6 +477,7 @@ class OpenRouterModels:
     # minimax_m2 = 'minimax/minimax-m2'  # $0.255-1.0, coding, 2025.10
     minimax_speech_2_8_turbo = 'minimax/speech-2.8-turbo' # $60/M, text-to-speech, 2026.07
     minimax_speech_2_8_hd = 'minimax/speech-2.8-hd' # $100/M, text-to-speech, 2026.07
+    minimax_hailuo_3_max = 'minimax/hailuo-3-max' # text/image -> video, $0.05/second, 2026.09
     minimax_hailuo_3 = 'minimax/hailuo-3' # text/image/audio/video -> video, $0.13/second, 2026.07
 
     grok_build_01 = 'x-ai/grok-build-0.1'  # coding, text/image -> text, $1-2, 2026.05
@@ -483,13 +496,18 @@ class OpenRouterModels:
     grok_img_video = 'x-ai/grok-imagine-video'  # text/image -> video, $0.05/second, 2026.05
     grok_img_video_1_5 = 'x-ai/grok-imagine-video-1.5'  # text/image -> video, $0.08/second, 2026.07
 
+    meta_muse_spark_1_3 = 'meta/muse-spark-1.3'  # $1.25-4.25, 2026.09
     meta_muse_spark_1_2 = 'meta/muse-spark-1.2'  # $1.25-4.25, 2026.08
     meta_muse_spark_1_1 = 'meta/muse-spark-1.1'  # $1.25-4.25, 2026.07
+    meta_muse_voice_transcribe_1 = 'meta/muse-voice-transcribe-1.0'  # $0.18/hour, 2026.09
     meta_muse_image = 'meta/muse-image'  # $0.01/image, 2026.08
 
-    mai_voice_2 = 'microsoft/mai-voice-2-flash'  # tts, $15/M, 2026.07
+    mai_voice_flash_2 = 'microsoft/mai-voice-2-flash'  # tts, $15/M, 2026.07
     mai_voice_2 = 'microsoft/mai-voice-2'  # tts, $22/M, 2026.06
+    mai_transcribe_2 = 'microsoft/mai-transcribe-2'  # stt, $0.1/hour, 2026.09
     mai_transcribe_1_5 = 'microsoft/mai-transcribe-1.5'  # stt, $0.36/hour, 2026.06
+    mai_image_2_6 = 'microsoft/mai-image-2.6'  # text/image -> image, $8/38/M tokens, 2026.09
+    mai_image_flash_2_6 = 'microsoft/mai-image-2.6-flash'  # text/image -> image, $2.5/19/M tokens, 2026.09
     mai_image_pro_2_5 = 'microsoft/mai-image-2.5-pro'  # text/image -> image, $5/M tokens, 2026.07
     mai_image_2_5 = 'microsoft/mai-image-2.5'  # text/image -> image, $5/M tokens, 2026.06
 
@@ -521,7 +539,7 @@ if __name__ == '__main__':
     import time
     from archaeo.io.files import json_dump
 
-    # llm = OpenRouterProvider(OpenRouterModels.qwen3_6_plus)
+    llm = OpenRouterProvider(OpenRouterModels.qwen3_8_flash)
     # resp = llm.chat(messages=[{'role': 'user', 'content': '请给我将一个关于程序员的笑话，用英语。'}], stream=False)
     # print(resp)
 
@@ -529,39 +547,39 @@ if __name__ == '__main__':
     # for chunk in resp:
     #     print(chunk, end='')
 
-    # all_models = llm.list_models()
-    # model_data = [model.model_dump(mode='json') for model in all_models]
-    # json_dump(model_data, '~/Downloads/openrouter_model_info.json', indent=2)
+    all_models = llm.list_models()
+    model_data = [model.model_dump(mode='json') for model in all_models]
+    json_dump(model_data, '~/Downloads/openrouter_model_info.json', indent=2)
     #
     # for m in llm.list_models()[:1000]:
     #     print(m)
     #     print()
 
-    # llm = OpenRouterProvider(OpenRouterModels.pplx_emb_v1_06b)  # 10: 1.3 vs 13
-    # llm = OpenRouterProvider(OpenRouterModels.pplx_emb_v1_4b)  # 10: 1.8 vs 13
-    # llm = OpenRouterProvider(OpenRouterModels.openai_emb_3_small) # 10: 2.5 vs. 15
-    llm = OpenRouterProvider(OpenRouterModels.openai_emb_3_large) # 10: 2.6 vs. 17
-    # llm = OpenRouterProvider(OpenRouterModels.gemini_emb_2) # 10: 2.75 vs. 16
-    # llm = OpenRouterProvider(OpenRouterModels.qwen3_emb_8b) # 10: 27 vs. 152
-    start = time.time()
-    emb = llm.embed('hello, world')
-    # print(emb)
-
-    print(f'time elapsed: {time.time() - start}')
-
-    texts = ['写给非哲学家的哲学入门',
-             '如何快速了解一个行业',
-             'Naked Statistics',
-             'Introducing Bertrand Russell',
-             '契诃夫的一生 (伊莱娜·内米洛夫斯基, 2018)'] * 2
-    start = time.time()
-    embs = llm.embed_batch(texts)
-    print(embs[0][:10])
-    print(f'time elapsed: {time.time() - start}')
-
-    start = time.time()
-    embs = []
-    for text in texts:
-        embs.append(llm.embed(text))
-    print(embs[0][:10])
-    print(f'time elapsed: {time.time() - start}')
+    # # llm = OpenRouterProvider(OpenRouterModels.pplx_emb_v1_06b)  # 10: 1.3 vs 13
+    # # llm = OpenRouterProvider(OpenRouterModels.pplx_emb_v1_4b)  # 10: 1.8 vs 13
+    # # llm = OpenRouterProvider(OpenRouterModels.openai_emb_3_small) # 10: 2.5 vs. 15
+    # llm = OpenRouterProvider(OpenRouterModels.openai_emb_3_large) # 10: 2.6 vs. 17
+    # # llm = OpenRouterProvider(OpenRouterModels.gemini_emb_2) # 10: 2.75 vs. 16
+    # # llm = OpenRouterProvider(OpenRouterModels.qwen3_emb_8b) # 10: 27 vs. 152
+    # start = time.time()
+    # emb = llm.embed('hello, world')
+    # # print(emb)
+    #
+    # print(f'time elapsed: {time.time() - start}')
+    #
+    # texts = ['写给非哲学家的哲学入门',
+    #          '如何快速了解一个行业',
+    #          'Naked Statistics',
+    #          'Introducing Bertrand Russell',
+    #          '契诃夫的一生 (伊莱娜·内米洛夫斯基, 2018)'] * 2
+    # start = time.time()
+    # embs = llm.embed_batch(texts)
+    # print(embs[0][:10])
+    # print(f'time elapsed: {time.time() - start}')
+    #
+    # start = time.time()
+    # embs = []
+    # for text in texts:
+    #     embs.append(llm.embed(text))
+    # print(embs[0][:10])
+    # print(f'time elapsed: {time.time() - start}')

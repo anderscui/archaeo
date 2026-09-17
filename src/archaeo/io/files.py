@@ -13,6 +13,19 @@ from typing import Callable, Optional, Iterator
 from archaeo import logger
 
 
+AUDIO_EXTENSIONS = {
+    "mp3", "wav", "aiff", "aif", "flac", "m4a", "aac", "ogg",
+}
+
+VIDEO_EXTENSIONS = {
+    "mp4", "m4v", "mov", "mkv", "avi", "wmv", "flv", "mpg", "mpeg",
+}
+
+IMAGE_EXTENSIONS = {
+    "png", "jpg", "jpeg", "gif", "webp", "bmp", "heic", "heif",
+}
+
+
 def list_files(
         directory: str | Path,
         pattern: str = "*",
@@ -163,7 +176,7 @@ def touch_file(file_path: str | Path):
 
 
 def ensure_parent_dir(path: str | Path) -> Path:
-    path = expand_user_path(path)
+    path = get_absolute_path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     return path
 
@@ -211,7 +224,7 @@ def write_text(
     text: str,
     encoding: str = "utf-8",
 ) -> None:
-    path = expand_user_path(path)
+    path = get_absolute_path(path)
     ensure_parent_dir(path)
     path.write_text(text, encoding=encoding)
 
