@@ -277,6 +277,14 @@ class OpenRouterProvider(BaseLlmProvider):
 
 
 class OpenRouterModels:
+    gpt_6_1_sol_pro = 'openai/gpt-6.1-sol-pro'  # $2-10, 2026.09
+    gpt_6_1_sol = 'openai/gpt-6.1-sol'  # $2-10, 2026.09
+    gpt_6_luna_pro = 'openai/gpt-6-luna-pro'  # $0.1-0.5, 2026.09, cheap
+    gpt_6_luna = 'openai/gpt-6-luna'  # $0.1-0.5, 2026.09, cheap
+    gpt_6_luna_batch = 'openai/gpt-6-luna:batch'  # $0.05-0.25, 2026.09, cheap
+    gpt_6_sol_pro = 'openai/gpt-6-sol-pro'  # $2-10, 2026.09
+    gpt_6_sol = 'openai/gpt-6-sol'  # $2-10, 2026.09
+    gpt_6_sol_batch = 'openai/gpt-6-sol:batch'  # $1-5, 2026.09
     gpt_6_astra_pro = 'openai/gpt-6-astra-pro'  # $10-50, 2026.09
     gpt_6_astra_pro_batch = 'openai/gpt-6-astra-pro:batch'  # $5-25, 2026.09
     gpt_6_astra = 'openai/gpt-6-astra'  # $10-50, 2026.09
@@ -356,6 +364,7 @@ class OpenRouterModels:
     claude_fable_5_1_batch = 'anthropic/claude-fable-5.1:batch'  # $5-25, 2026.09
     claude_fable_5_1 = 'anthropic/claude-fable-5.1'  # $10-50, 2026.09
     claude_fable_5 = 'anthropic/claude-fable-5'  # $10-50, 2026.06
+    claude_opus_5_5 = 'anthropic/claude-opus-5.5'  # $4-20, 2026.09
     claude_opus_5_fast = 'anthropic/claude-opus-5-fast'  # $10-50, 2026.07
     claude_opus_5 = 'anthropic/claude-opus-5'  # $5-25, 2026.07
     claude_opus_4_8_fast = 'anthropic/claude-opus-4.8-fast'  # $10-50, 2026.05
@@ -366,6 +375,7 @@ class OpenRouterModels:
     # claude_opus_4_5 = 'anthropic/claude-opus-4.5'  # coding, $5-25, 2025.11
     # claude_opus_4_1 = 'anthropic/claude-opus-4.1'  # coding, $15-75, 2025.08
     # claude_opus_4 = 'anthropic/claude-opus-4'  # coding, $15-75, 2025.05
+    claude_sonnet_5_5 = 'anthropic/claude-sonnet-5.5'  # $2-10, 2026.09
     claude_sonnet_5 = 'anthropic/claude-sonnet-5'  # $2-10, 2026.07
     # claude_sonnet_4_6 = 'anthropic/claude-sonnet-4.6'  # coding, $3-15, 2026.02
     # claude_sonnet_4_5 = 'anthropic/claude-sonnet-4.5'  # coding, $3-15, 2025.09
@@ -391,11 +401,15 @@ class OpenRouterModels:
     # gemini_pro_2_5 = 'google/gemini-2.5-pro'  # translation, $1.25-10, 2025.06
 
     gemini_chirp_3 = 'google/chirp-3'  # speech-to-text, $0.016/minute, 2026.05
+    gemini_flash_tts_3_8 = 'google/gemini-3.8-flash-tts'  # tts, $0.5-9, 2026.09
+    gemini_flash_tts_3_8_lite = 'google/gemini-3.8-flash-lite-tts'  # tts, $0.5-6, 2026.09
     gemini_flash_tts_3_1 = 'google/gemini-3.1-flash-tts-preview'  # text-to-speech, $1-20, 2026.04
     gemini_pro_3_image = 'google/gemini-3-pro-image'  # $2-12, Nano Banana, 2026.06
     gemini_flash_3_1_image_lite = 'google/gemini-3.1-flash-lite-image'  # $0.25-1.5, Nano Banana, 2026.06
     gemini_flash_3_1_image = 'google/gemini-3.1-flash-image'  # $0.5-3, Nano Banana, 2026.06
     # gemini_flash_2_5_image = 'google/gemini-2.5-flash-image'  # $0.3-2.5, Nano Banana, 2025.10
+
+    gemini_transcribe_3_5 = 'google/gemini-3.5-transcribe'  # stt, $2-12, 2026.09
 
     google_veo_3_1_fast = 'google/veo-3.1-fast'  # video gen, $0.1 per sec, 2026.04
     google_veo_3_1_lite = 'google/veo-3.1-lite'  # video gen, $0.05 per sec, 2026.04
@@ -411,6 +425,7 @@ class OpenRouterModels:
     # gemma_4_26b = 'google/gemma-4-26b-a4b-it'
 
     # qwen
+    qwen3_8_omni_flash = 'qwen/qwen3.8-omni-flash'  # $0.15-0.47, 2026.09, cheap, multi-modal
     qwen3_8_max_0902 = 'qwen/qwen3.8-max-0902'  # $2-6, 2026.09
     qwen3_8_max = 'qwen/qwen3.8-max'  # $2-6, 2026.08
     qwen3_8_flash = 'qwen/qwen3.8-flash'  # $0.16-0.47, 2026.08, cheap
@@ -461,6 +476,7 @@ class OpenRouterModels:
 
     glm_5_3 = 'z-ai/glm-5.3'  # $1.4-4.4, 2026.08
     glm_5_3_flash = 'z-ai/glm-5.3-flash'  # $0.075-0.25, 2026.08, cheap
+    glm_5_3_flashx = 'z-ai/glm-5.3-flashx'  # $0.37-1.25, 2026.09, fast
     glm_5_2 = 'z-ai/glm-5.2'  # $0.4875-1.56, 2026.06
     # glm_5_1 = 'z-ai/glm-5.1'  # coding, $1.05-3.5, 2026.04
     glm_5v_turbo = 'z-ai/glm-5v-turbo'  # mm agent, $1.2-4, 2026.04
@@ -480,11 +496,12 @@ class OpenRouterModels:
     minimax_hailuo_3_max = 'minimax/hailuo-3-max' # text/image -> video, $0.05/second, 2026.09
     minimax_hailuo_3 = 'minimax/hailuo-3' # text/image/audio/video -> video, $0.13/second, 2026.07
 
-    grok_build_01 = 'x-ai/grok-build-0.1'  # coding, text/image -> text, $1-2, 2026.05
-    grok_4_6 = 'x-ai/grok-4.6'  # mm, $2-6, 2026.08
-    grok_4_5 = 'x-ai/grok-4.5'  # $2-6, 2026.07
+    # grok_build_01 = 'x-ai/grok-build-0.1'  # coding, text/image -> text, $1-2, 2026.05
+    grok_4_7 = 'x-ai/grok-4.7'  # mm, $2-6, 2026.09
+    # grok_4_6 = 'x-ai/grok-4.6'  # mm, $2-6, 2026.08
+    # grok_4_5 = 'x-ai/grok-4.5'  # $2-6, 2026.07
     # grok_4_3 = 'x-ai/grok-4.3'  # $1.25-2.5, 2026.05
-    grok_4_20_multi_agent = 'x-ai/grok-4.20-multi-agent'  # $2-6, 2026.03
+    # grok_4_20_multi_agent = 'x-ai/grok-4.20-multi-agent'  # $2-6, 2026.03
     # grok_4_20 = 'x-ai/grok-4.20'  # $2-6, 2026.03
     # grok_4_1_fast = 'x-ai/grok-4.1-fast'  # $0.2-0.5, 2025.11
     # grok_4 = 'x-ai/grok-4'  # $3-15, 2025.07
@@ -502,6 +519,8 @@ class OpenRouterModels:
     meta_muse_voice_transcribe_1 = 'meta/muse-voice-transcribe-1.0'  # $0.18/hour, 2026.09
     meta_muse_image = 'meta/muse-image'  # $0.01/image, 2026.08
 
+    mai_voice_flash_2_1 = 'microsoft/mai-voice-2.1-flash'  # tts, $15/M, 2026.09
+    mai_voice_2_1 = 'microsoft/mai-voice-2.1'  # tts, $22/M, 2026.09
     mai_voice_flash_2 = 'microsoft/mai-voice-2-flash'  # tts, $15/M, 2026.07
     mai_voice_2 = 'microsoft/mai-voice-2'  # tts, $22/M, 2026.06
     mai_transcribe_2 = 'microsoft/mai-transcribe-2'  # stt, $0.1/hour, 2026.09
@@ -516,16 +535,24 @@ class OpenRouterModels:
     pplx_emb_v1_06b = 'perplexity/pplx-embed-v1-0.6b'  # $0.004, 2026.03
     pplx_emb_v1_4b = 'perplexity/pplx-embed-v1-4b'  # $0.03, 2026.03
 
+    jev_1_13 = 'typesafe/jev-1.13'  # system one, $0.042-0, 2026.09
+    kev_4b = 'jaredpalmer/kev-4b'  # system one, $0.042-0, 2026.09
+
     voyage_emb_4_large = 'voyageai/voyage-4-large'  # $0.12/M, 2026.07, dim: 2048, 1024, 512, and 256
     voyage_emb_4 = 'voyageai/voyage-4'  # $0.06/M, 2026.07, dim: 2048
     voyage_emb_4_lite = 'voyageai/voyage-4-lite'  # $0.02/M, 2026.07, dim: 2048, 1024, 512, and 256
     voyage_emb_mm_3_5 = 'voyageai/voyage-multimodal-3.5'  # text/image -> emb, $0.6/M, 2026.07, dim: 2048, 1024, 512, and 256
+    voyage_rerank_3_lite = 'voyageai/rerank-3-lite'  # text -> rerank, $0.02/M, 2026.09 (original: 2026.09)
+    voyage_rerank_3 = 'voyageai/rerank-3'  # text -> rerank, $0.05/M, 2026.09 (original: 2026.09)
     voyage_rerank_2_5 = 'voyageai/rerank-2.5'  # text -> rerank, $0.05/M, 2026.07 (original: 2025.08)
     voyage_rerank_2_5_lite = 'voyageai/rerank-2.5-lite'  # text -> rerank, $0.02/M, 2026.07 (original: 2025.08)
 
     hy_mt2_18b = 'tencent/hy-mt2-1.8b'  # translation+dialects, $0.044-0.177, 2026.08
     hy_mt2_7b = 'tencent/hy-mt2-7b'  # translation+dialects, $0.074-0.295, 2026.08
     hy_mt2_30b = 'tencent/hy-mt2-30b-a3b'  # translation+dialects, $0.074-0.295, 2026.08
+
+    mimo_pro_2_6 = 'xiaomi/mimo-v2.6-pro'  # $0.43-0.87, 2026.09, mm
+    mimo_flash_2_6 = 'xiaomi/mimo-v2.6-flash'  # $0.11-0.28, 2026.09, mm
 
     lfm_emb_2_5_350m = 'liquid/lfm-2.5-embedding-350m:free'  # 350m, free, 2026.08
     flux_video_3 = 'black-forest-labs/flux-3-video'  # $0.17/second, 2026.08
