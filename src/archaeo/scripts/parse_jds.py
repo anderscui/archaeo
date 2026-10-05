@@ -5,10 +5,12 @@ from pathlib import Path
 import json
 import os
 
+from archaeo import logger
+from archaeo.io.file_texts import get_file_text
 from archaeo.llm.postprocess import strip_markdown_lang_wrappers
 from archaeo.llm_providers import OllamaProvider
 from archaeo.llm_providers.openrouter import OpenRouterProvider, OpenRouterModels
-from archaeo.io.files import json_dump, list_files, get_absolute_path, copy_file
+from archaeo.io.files import json_dump, list_files, get_absolute_path, copy_file, read_text, write_text
 
 
 def parse_one_jd(provider, jd: str) -> dict:
@@ -100,8 +102,16 @@ def parse_one_jd(provider, jd: str) -> dict:
     return data
 
 
+def build_jd_dirs(raw_dir: str | Path) -> tuple[Path, Path, Path]:
+    raw_dir = get_absolute_path(raw_dir)
+    renamed_dir = raw_dir.with_name(f'{raw_dir.stem}-renamed')
+    extracted_dir = raw_dir.with_name(f'{raw_dir.stem}-extracted')
+    parsed_dir = raw_dir.with_name(f'{raw_dir.stem}-parsed')
+    return renamed_dir, extracted_dir, parsed_dir
+
+
 def load_raw_jobs(source_dir: str | Path) -> list[Path]:
-    return list(list_files(source_dir, excludes=lambda f: f.suffix.lower() not in ('.png', '.txt', '.md')))
+    return sorted(list_files(source_dir, excludes=lambda f: f.suffix.lower() not in ('.png', '.txt', '.md')))
 
 
 def rename_raw_jobs(source_dir: str | Path, output_dir: str | Path) -> list[Path]:
@@ -119,8 +129,11 @@ def rename_raw_jobs(source_dir: str | Path, output_dir: str | Path) -> list[Path
         grouped_files[jd_file.suffix].append(jd_file)
     # print(grouped_files.keys())
 
+    renamed = []
     counted = 0
     for k, v in sorted(grouped_files.items()):
+        v = sorted(v)
+
         print(k)
         range_start = counted+1
         range_end = counted + len(v)
@@ -139,6 +152,7 @@ def rename_raw_jobs(source_dir: str | Path, output_dir: str | Path) -> list[Path
                 done.append(cur_file)
                 new_file = output_dir / cur_file.name
                 copy_file(cur_file, new_file)
+                renamed.append(new_file)
             else:
                 targets.append(cur_file)
                 targets2.append(i)
@@ -154,14 +168,91 @@ def rename_raw_jobs(source_dir: str | Path, output_dir: str | Path) -> list[Path
                 new_file = output_dir / name_fmt.format(num=i, ext=k)
                 # print(f'{ext_file.name} -> {new_file.name}')
                 copy_file(ext_file, new_file)
+                renamed.append(new_file)
 
         print('\n')
 
-    return []
+    return renamed
 
 
-def extract_jd_contents(raw_jds: list[Path], target_dir: str | Path) -> list[Path]:
-    return []
+def extract_jd_contents(source_dir: str | Path, target_dir: str | Path, ocr_provider=None) -> list[Path]:
+    source_dir = get_absolute_path(source_dir)
+    target_dir = get_absolute_path(target_dir)
+
+    extracted = []
+    raw_jd_files = sorted(list_files(source_dir, '*.*', excludes=lambda f: '.DS_Store' in str(f)))
+    for jd_file in raw_jd_files:
+        target_file = target_dir / (jd_file.stem + '.txt')
+        if target_file.exists():
+            continue
+
+        # print(jd_file)
+        # ext = jd_file.suffix.lower()
+        content = get_file_text(jd_file, ocr_provider) or ''
+        # if ext in {'.png', '.jpg', '.jpeg'}:
+        #     content = 'ocr'
+        # elif ext in {'.txt'}:
+        #     content = read_text(jd_file)
+        # elif ext in {'.md'}:
+        #     content = read_text(jd_file)
+        # else:
+        #     logger.info(f'unknown extension for jd content extraction: {ext}')
+        write_text(target_file, content)
+        extracted.append(target_file)
+    return extracted
+
+
+def parse_jd_files(source_dir: str | Path,
+                   target_dir: str | Path,
+                   parse_provider) -> list[Path]:
+    source_dir = get_absolute_path(source_dir)
+    target_dir = get_absolute_path(target_dir)
+
+    parsed = []
+    content_files = sorted(list_files(source_dir, '*.txt'))
+    for content_file in content_files:
+        target_file = target_dir / (content_file.stem + '.json')
+        if target_file.exists():
+            logger.debug(f'skip jd parsing: {target_file}')
+            continue
+
+        try:
+            result = parse_one_jd(parse_provider, read_text(content_file))
+            assert isinstance(result, dict)
+        except Exception as e:
+            print(f'parse jd error: {e}')
+            result = {}
+        json_dump(result, target_file)
+        parsed.append(target_file)
+
+    return parsed
+
+
+def pipeline_jds(raw_jd_dir: str | Path, rename=True):
+    renamed_jd_dir, extracted_jd_dir, parsed_jd_dir = build_jd_dirs(raw_jd_dir)
+    print(renamed_jd_dir, extracted_jd_dir, parsed_jd_dir)
+
+    # raw_jd_files = load_raw_jobs(raw_jd_dir)
+    # print(len(raw_jd_files))
+    # print(raw_jd_files)
+
+    if rename:
+        renamed_jd_files = rename_raw_jobs(raw_jd_dir, renamed_jd_dir)
+        print(renamed_jd_files)
+
+    llm_ocr = OpenRouterProvider(OpenRouterModels.gemini_flash_lite_3_1)
+    jd_content_files = extract_jd_contents(renamed_jd_dir, extracted_jd_dir, ocr_provider=llm_ocr)
+    print(jd_content_files)
+
+    # jd_content_files = sorted(list_files(extracted_jd_dir, '*.txt'))
+    # print(jd_content_files)
+    # llm_extract = OpenRouterProvider(OpenRouterModels.gemini_flash_lite_3_1)
+    # # llm_extract = OpenRouterProvider(OpenRouterModels.gemini_flash_lite_3_5)
+    # # print(parse_one_jd(llm_extract, read_text(jd_content_files[-1])))
+
+    llm_parse = OpenRouterProvider(OpenRouterModels.gemini_flash_lite_3_1)
+    parsed_files = parse_jd_files(extracted_jd_dir, parsed_jd_dir, llm_parse)
+    print(f'{parsed_files=}')
 
 
 def try_parse_one_jd():
@@ -210,7 +301,7 @@ def main():
     jds = [jd for jd in jds_text.split('=====') if jd.strip()]
     print(f'jd count: {len(jds)}')
 
-    provider = OpenRouterProvider(OpenRouterModels.gemini_flash_lite_3_5)
+    provider = OpenRouterProvider(OpenRouterModels.gemini_flash_lite_3_1)
     parsed_jds = []
     for jd in jds:
         try:
@@ -229,9 +320,27 @@ def main():
 if __name__ == "__main__":
     # try_parse_one_jd()
 
-    raw_jd_dir = '~/Downloads/jobs/py-202608'
-    renamed_jd_dir = '~/Downloads/jobs/py-202608-renamed'
+    raw_jd_dir = '~/Downloads/jobs/nlp-202607'
+    renamed_jd_dir, extracted_jd_dir, parsed_jd_dir = build_jd_dirs(raw_jd_dir)
+    print(renamed_jd_dir, extracted_jd_dir, parsed_jd_dir)
+
+    # renamed_jd_dir = '~/Downloads/jobs/py-202609-renamed'
+    # extracted_jd_dir = '~/Downloads/jobs/py-202609-extracted'
+    # parsed_jd_dir = '~/Downloads/jobs/py-202609-parsed'
+
     # raw_jd_files = load_raw_jobs(raw_jd_dir)
     # print(len(raw_jd_files))
     # print(raw_jd_files)
-    rename_raw_jobs(raw_jd_dir, renamed_jd_dir)
+
+    # renamed_jd_files = rename_raw_jobs(raw_jd_dir, renamed_jd_dir)
+    # print(renamed_jd_files)
+
+    pipeline_jds(raw_jd_dir, rename=True)
+
+    # llm_ocr = OpenRouterProvider(OpenRouterModels.gemini_flash_lite_3_1)
+    # jd_content_files = extract_jd_contents(renamed_jd_dir, extracted_jd_dir, ocr_provider=llm_ocr)
+    # print(jd_content_files)
+    #
+    # llm_parse = OpenRouterProvider(OpenRouterModels.gemini_flash_lite_3_1)
+    # parsed_files = parse_jd_files(extracted_jd_dir, parsed_jd_dir, llm_parse)
+    # print(f'{parsed_files=}')
