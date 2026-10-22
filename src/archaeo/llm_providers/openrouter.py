@@ -381,10 +381,14 @@ class OpenRouterModels:
     # claude_sonnet_4_5 = 'anthropic/claude-sonnet-4.5'  # coding, $3-15, 2025.09
     # claude_sonnet_4 = 'anthropic/claude-sonnet-4'  # image, coding, $3-15, 2025.05
     # claude_sonnet_3_7 = 'anthropic/claude-3.7-sonnet'  # 2025.02
+    claude_haiku_5_5 = 'anthropic/claude-haiku-5.5'  # $0.1-0.5, 2026.10
+    claude_haiku_5_5_batch = 'anthropic/claude-haiku-5.5:batch'  # $0.05-0.25, 2026.10
     # claude_haiku_4_5 = 'anthropic/claude-haiku-4.5'  # coding, $1-5, 2025.10
     # claude_haiku_3_5 = 'anthropic/claude-3.5-haiku'  # fastest model for daily tasks, 2024.11
 
     # google: translation, coding
+    gemini_4_argon_batch = 'google/gemini-4-argon:batch'  # $1-5, 2026.10
+    gemini_4_argon = 'google/gemini-4-argon'  # $2-10, 2026.10
     gemini_flash_3_8_batch = 'google/gemini-3.8-flash:batch'  # mm, $0.75-3.75, 2026.09
     gemini_flash_3_8 = 'google/gemini-3.8-flash'  # mm, $1.5-7.5, 2026.09
     gemini_flash_3_7_batch = 'google/gemini-3.7-flash:batch'  # mm, $0.75-3.75, 2026.08
@@ -404,6 +408,7 @@ class OpenRouterModels:
     gemini_flash_tts_3_8 = 'google/gemini-3.8-flash-tts'  # tts, $0.5-9, 2026.09
     gemini_flash_tts_3_8_lite = 'google/gemini-3.8-flash-lite-tts'  # tts, $0.5-6, 2026.09
     gemini_flash_tts_3_1 = 'google/gemini-3.1-flash-tts-preview'  # tts, $1-20, 2026.04
+    gemini_nano_banana_2_1 = 'google/gemini-nano-banana-2.1'  # $1.5-30, 2026.10
     gemini_pro_3_image = 'google/gemini-3-pro-image'  # $2-12, Nano Banana, 2026.06
     gemini_flash_3_1_image_lite = 'google/gemini-3.1-flash-lite-image'  # $0.25-1.5, Nano Banana, 2026.06
     gemini_flash_3_1_image = 'google/gemini-3.1-flash-image'  # $0.5-3, Nano Banana, 2026.06
@@ -461,6 +466,7 @@ class OpenRouterModels:
     qwen3_asr_06b = 'qwen/qwen3-asr-0.6b'  # stt, $0.000003/second, 2026.08
     qwen3_asr_flash_2602 = 'qwen/qwen3-asr-flash-2026-02-10'  # stt, $0.000035/second, 2026.05
 
+    deepseek_v4_1_flash_1017 = 'deepseek/deepseek-v4.1-flash-1017'  # , $0.07-0.50, 2026.10
     deepseek_v4_1_flash = 'deepseek/deepseek-v4.1-flash'  # , $0.15-0.6, 2026.09
     deepseek_v4_pro_0813 = 'deepseek/deepseek-v4-pro-0813'  # , $1.115-3.346, 2026.08
     deepseek_v4_flash_vision_exp = 'deepseek/deepseek-v4-flash-vision-exp'  # , $0.44-1.32, 2026.08
@@ -513,30 +519,41 @@ class OpenRouterModels:
     grok_img_video = 'x-ai/grok-imagine-video'  # text/image -> video, $0.05/second, 2026.05
     grok_img_video_1_5 = 'x-ai/grok-imagine-video-1.5'  # text/image -> video, $0.08/second, 2026.07
 
+    meta_muse_wonder = 'meta/muse-wonder'  # $4-20, 2026.10
     meta_muse_spark_1_3 = 'meta/muse-spark-1.3'  # $1.25-4.25, 2026.09
     # meta_muse_spark_1_2 = 'meta/muse-spark-1.2'  # $1.25-4.25, 2026.08
     # meta_muse_spark_1_1 = 'meta/muse-spark-1.1'  # $1.25-4.25, 2026.07
     meta_muse_voice_transcribe_1 = 'meta/muse-voice-transcribe-1.0'  # $0.18/hour, 2026.09
     meta_muse_image = 'meta/muse-image'  # $0.01/image, 2026.08
 
-    mai_voice_flash_2_1 = 'microsoft/mai-voice-2.1-flash'  # tts, $15/M, 2026.09
-    mai_voice_2_1 = 'microsoft/mai-voice-2.1'  # tts, $22/M, 2026.09
+    mai_voice_flash_2_1 = 'microsoft/mai-voice-2.1-flash'  # tts, $15/M, 2026.10
+    mai_voice_2_1 = 'microsoft/mai-voice-2.1'  # tts, $22/M, 2026.10
     mai_voice_flash_2 = 'microsoft/mai-voice-2-flash'  # tts, $15/M, 2026.07
     mai_voice_2 = 'microsoft/mai-voice-2'  # tts, $22/M, 2026.06
     mai_transcribe_2 = 'microsoft/mai-transcribe-2'  # stt, $0.1/hour, 2026.09
-    mai_transcribe_1_5 = 'microsoft/mai-transcribe-1.5'  # stt, $0.36/hour, 2026.06
+    # mai_transcribe_1_5 = 'microsoft/mai-transcribe-1.5'  # stt, $0.36/hour, 2026.06
     mai_image_2_6 = 'microsoft/mai-image-2.6'  # text/image -> image, $8/38/M tokens, 2026.09
     mai_image_flash_2_6 = 'microsoft/mai-image-2.6-flash'  # text/image -> image, $2.5/19/M tokens, 2026.09
-    mai_image_pro_2_5 = 'microsoft/mai-image-2.5-pro'  # text/image -> image, $5/M tokens, 2026.07
-    mai_image_2_5 = 'microsoft/mai-image-2.5'  # text/image -> image, $5/M tokens, 2026.06
+    # mai_image_pro_2_5 = 'microsoft/mai-image-2.5-pro'  # text/image -> image, $5/M tokens, 2026.07
+    # mai_image_2_5 = 'microsoft/mai-image-2.5'  # text/image -> image, $5/M tokens, 2026.06
 
-    mistral_mini_transcribe = 'mistralai/voxtral-mini-transcribe'  # audio -> transcription, $$0.003/second, 2026.05
+    mistral_mini_transcribe = 'mistralai/voxtral-mini-transcribe'  # audio -> transcription, $0.003/second, 2026.05
+    mistral_large_4 = 'mistralai/mistral-large-4-0'  # $1.36-4.18/M, 2026.10
+    mistral_mini_tts_3 = 'mistralai/voxtral-mini-tts-3-0'  # $13/M, 2026.10
 
     pplx_emb_v1_06b = 'perplexity/pplx-embed-v1-0.6b'  # $0.004, 2026.03
     pplx_emb_v1_4b = 'perplexity/pplx-embed-v1-4b'  # $0.03, 2026.03
 
+    jev_1_14 = 'typesafe/jev-1.14'  # system one, $0.042-0, 2026.10
     jev_1_13 = 'typesafe/jev-1.13'  # system one, $0.042-0, 2026.09
     kev_4b = 'jaredpalmer/kev-4b'  # system one, $0.042-0, 2026.09
+    clef = 'cloudflare/clef'  # system one, $0.042-0, 2026.10
+    clef_flash = 'cloudflare/clef-flash'  # system one, $0.021-0, 2026.10
+    clef_omni = 'cloudflare/clef-omni'  # system one, $0.15-0, 2026.10
+    gpt_6_luna_decisions = 'openai/gpt-6-luna-decisions'  # $0.1-0/M, 2026.10
+    microsoft_decision_1 = 'microsoft/microsoft-decision-1'  # $0.042-0/M, 2026.10
+    pplx_decider_1_2 = 'perplexity/pplx-decider-v1.2'  # $0.02-0/M, 2026.10
+    pplx_decider_1_2_flash = 'perplexity/pplx-decider-flash-v1.2'  # $0.01-0/M, 2026.10
 
     voyage_emb_4_large = 'voyageai/voyage-4-large'  # $0.12/M, 2026.07, dim: 2048, 1024, 512, and 256
     voyage_emb_4 = 'voyageai/voyage-4'  # $0.06/M, 2026.07, dim: 2048
