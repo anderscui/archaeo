@@ -40,7 +40,7 @@ class ModelInfo(BaseModel):
     context_length: Optional[int] = None
     modality: Optional[str] = None
     input_modality: list[Literal['text', 'image', 'audio', 'video', 'file']] = Field(default_factory=lambda: [])
-    output_modality: list[Literal['text', 'image', 'audio', 'video', 'transcription', 'speech', 'embeddings', 'rerank']] = Field(default_factory=lambda: [])
+    output_modality: list[Literal['text', 'image', 'audio', 'video', 'transcription', 'speech', 'embeddings', 'rerank', 'decisions']] = Field(default_factory=lambda: [])
     tokenizer: Optional[str] = None
     disk_size: Optional[int] = None  # for local models only
 
@@ -51,7 +51,7 @@ class ModelInfo(BaseModel):
         'chat', 'vision',
         'image', 'audio', 'video',
         'stt', 'tts',
-        'embedding', 'rerank',
+        'embedding', 'rerank', 'decisions',
         'tool', 'structured_output', 'reasoning', 'web_search',
     ]] = Field(default_factory=lambda: ['chat'])
     supported_parameters: list[str] = Field(default_factory=lambda: [])

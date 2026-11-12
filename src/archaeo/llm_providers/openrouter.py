@@ -208,6 +208,9 @@ class OpenRouterProvider(BaseLlmProvider):
             if 'rerank' in out_mods:
                 caps.add(Capability.RERANK)
 
+            if 'decisions' in out_mods:
+                caps.add(Capability.DECISIONS)
+
             # advanced capabilities
             if 'tools' in supported_params:
                 caps.add(Capability.TOOL)
@@ -230,7 +233,7 @@ class OpenRouterProvider(BaseLlmProvider):
             resp.raise_for_status()
             data = resp.json()
 
-            # print(json.dumps(data, indent=2, ensure_ascii=False))
+            json_dump(data, 'openrouter_models_raw.json', ensure_ascii=False)
 
             models = []
             for model in data.get('data', []):
@@ -593,7 +596,7 @@ if __name__ == '__main__':
 
     all_models = llm.list_models()
     model_data = [model.model_dump(mode='json') for model in all_models]
-    json_dump(model_data, '~/Downloads/openrouter_model_info.json', indent=2)
+    json_dump(model_data, '~/Downloads/openrouter_model_info_261029.json', indent=2)
     #
     # for m in llm.list_models()[:1000]:
     #     print(m)

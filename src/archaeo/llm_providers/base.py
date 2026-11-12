@@ -36,6 +36,7 @@ class Capability:
     STRUCTURED_OUTPUT = 'structured_output'
     REASONING = 'reasoning'
     WEB_SEARCH = 'web_search'
+    DECISIONS = 'decisions'
     # LOGPROBS = 'logprobs'
 
 
